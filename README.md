@@ -3,13 +3,13 @@ Methods for Analyzing Data for Electrochemical CO2 Capture Project
 
 Methods contain 
 
-### 1.0 E-Chem Methods
-### 2.0 Gas Flow Methods
-### 3.0 Theoretical DIC Calculation Methods
-### 4.0 Utility Methods
-### 5.0 Plotting Methods
+### 1 E-Chem Methods
+### 2 Gas Flow Methods
+### 3 Theoretical DIC Calculation Methods
+### 4 Utility Methods
+### 5 Plotting Methods
 
-## 1.0 E-Chem Methods
+## 1 E-Chem Methods
 
 This section contains the following methods:
 **find_date_time**: Reads a Gamry file, finds its creation datetime, and returns a datetime variable.
@@ -26,7 +26,7 @@ This section contains the following methods:
 
 
 
-## 2.0 Gas Flow Methods
+## 2 Gas Flow Methods
 
 **find_gas_change_time**: Reads a dataset that has a time_attribute. This dataset should contain CO2 concentration change info. Returns a dataset that contains the time that each gas switch is made.
 
@@ -35,7 +35,7 @@ This section contains the following methods:
 **calculate_amount**: Reads a gas info dataset created by **pd.read_csv**, and a time period dataset by **find_echem_time_period**. Calculates the amount of CO2 captured and released. Returns a dataset containing the cycle number, captured amount, outgas amount, average amount, fitting parameters for capture and outgas, and indices associated with the start and end of the capture/outgas processes
 
 
-## 3.0 Theoretical DIC Calculation Methods
+## 3 Theoretical DIC Calculation Methods
 
 **dic**: Takes $CO_2(aq)$ in M and pH value and then return the dissolve inorganic carbon concentration in M; solve_value is used when **scipy.optimize.fsolve** is called in order to solve for $CO_2(aq)$ or pH given $DIC$.
 
@@ -48,9 +48,9 @@ This section contains the following methods:
 **calc_DIC**: Takes `total_df`,`echem_time_df` and `gas_change_time_df`, obtains $pCO_2$, $pH_{measured}$, and $TA$ in (M) from the dataframes and return a table of all these value and $pH_{theorey,eq}$ (theoretical pH at gas/solution equilibrium given TA)$DIC_{TA}$ (DIC estimated from TA and measured pH), $DIC_{eq}$ (DIC estimated from measured pH while assuming gas/solution equilibrium) and DIC_{theory,eq} (theoretical DIC at gas/solution equilibrium given TA). For gas equilibrium I mean Gas/solution equilibrium: $CO_2(aq) =0.035 * pCO_2$
 
 
-## 4.0 Utility Methods
+## 4 Utility Methods
 
 **merge_echem_gas_df**: Combine datasets from 2.0 and 2.1 by merging on `Time_Delta`, which is time minus the first time stamp of `gas_df`. Remove weird data by removing data obtained beyond cycle 11. Fit co2 signal by cubic spline obtained on 20210103. Correct flow rate. Arbitrarily fix incorrect $CO_2$ percentage by setting $CO_2>0.9$ bar to 1.
 
 
-## 5.0 Plotting Methods
+## 5 Plotting Methods
