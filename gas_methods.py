@@ -132,7 +132,7 @@ def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter =
     :param capture_parameter: The dataset attribute used for capture baseline fitting, usually "Corrected_Flow_Right"
 
     :type outgas_parameter: string
-    :param outgas_parameter: (*To be done*) the dataset attribute used for outgas baseline fitting
+    :param outgas_parameter:  The dataset attribute used for outgas baseline fitting, usually "Corrected_Flow_Right"
 
     :type baseline: string or float
     :param baseline: enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline
@@ -214,8 +214,8 @@ def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter =
             outgas_amount = np.sum((outgas_df.shift(periods=shift_periods)[outgas_parameter]-(o[0]*outgas_df['Time_Delta']+o[1]))/60.0)
             
         else:
-            capture_amount = sum((capture_df.shift(periods=shift_periods)[parameter]-baseline)/60.0*capture_df['Corrected_Flow_Right'])
-            outgas_amount = sum((outgas_df.shift(periods=shift_periods)[parameter]-baseline)/60.0)
+            capture_amount = sum((capture_df.shift(periods=shift_periods)[capture_parameter]-baseline)/60.0*capture_df['Corrected_Flow_Right'])
+            outgas_amount = sum((outgas_df.shift(periods=shift_periods)[outgas_parameter]-baseline)/60.0)
 
 
 

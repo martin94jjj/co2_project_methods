@@ -85,6 +85,9 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">co2_project_methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Help.html">Help</a></li>
 </ul>
 
             
@@ -285,7 +288,7 @@
 <span class="sd">    :param capture_parameter: The dataset attribute used for capture baseline fitting, usually &quot;Corrected_Flow_Right&quot;</span>
 
 <span class="sd">    :type outgas_parameter: string</span>
-<span class="sd">    :param outgas_parameter: (*To be done*) the dataset attribute used for outgas baseline fitting</span>
+<span class="sd">    :param outgas_parameter:  The dataset attribute used for outgas baseline fitting, usually &quot;Corrected_Flow_Right&quot;</span>
 
 <span class="sd">    :type baseline: string or float</span>
 <span class="sd">    :param baseline: enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline</span>
@@ -367,8 +370,8 @@
             <span class="n">outgas_amount</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">outgas_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">outgas_parameter</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">outgas_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">/</span><span class="mf">60.0</span><span class="p">)</span>
             
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">capture_amount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">capture_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">parameter</span><span class="p">]</span><span class="o">-</span><span class="n">baseline</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="o">*</span><span class="n">capture_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">])</span>
-            <span class="n">outgas_amount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">outgas_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">parameter</span><span class="p">]</span><span class="o">-</span><span class="n">baseline</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="p">)</span>
+            <span class="n">capture_amount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">capture_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">capture_parameter</span><span class="p">]</span><span class="o">-</span><span class="n">baseline</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="o">*</span><span class="n">capture_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">])</span>
+            <span class="n">outgas_amount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">outgas_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">outgas_parameter</span><span class="p">]</span><span class="o">-</span><span class="n">baseline</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="p">)</span>
 
 
 
