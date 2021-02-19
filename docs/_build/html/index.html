@@ -32,6 +32,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -86,7 +87,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">co2_project_methods</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_local/tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Help.html">Help</a></li>
 </ul>
@@ -156,15 +157,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="documentation-for-co2-project-methods">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="documentation-for-co2-project-methods">
 <h1>Documentation for co2_project_methods<a class="headerlink" href="#documentation-for-co2-project-methods" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/co2_exp_setup.png"><img alt="alternate text" class="align-center" src="_images/co2_exp_setup.png" style="width: 600px;" /></a>
 <p>Welcome to use co2_project_methods. This package contain modules that help you analyze data for electrochemical pH swing CO2 capture/release experiemnts.</p>
 <p>1 E-Chem module: help you analyze electrochemical data, such as voltage, current and pH data recorded by a Gamry Potentiostat.</p>
 <p>2 Gas Flow Methods: help you analyze gas flow data, such as pCO2, gas flow rate and mass flow controller input recorded by an Arduino.</p>
 <p>3 Theoretical DIC Calculation Methods: helps you analyze dissolved inorganic carbon concentration given a state.</p>
 <p>4 Utility Methods: Utility functions that facilitate data processing.</p>
 <p>5 Plotting Methods: Provide easy presentation of the analyzed data.</p>
-<p>Use Package: Clone <a class="reference external" href="https://github.com/martin94jjj/co2_project_methods.git">https://github.com/martin94jjj/co2_project_methods.git</a></p>
+<p><strong>Use Package</strong>: Clone <a class="reference external" href="https://github.com/martin94jjj/co2_project_methods.git">https://github.com/martin94jjj/co2_project_methods.git</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please cite Jin <em>et al.</em>, <em>Energy Environ. Sci.</em>, 2020,13, 3706-3722 if you use this package to analyze your data.</p>
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -176,7 +206,33 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">utils module</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_local/tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_local/tutorial.html#0.Import-packages">0.Import packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#0.0-Import-common-python-packges">0.0 Import common python packges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#0.1-Import-packages-from-co2_project_methods">0.1 Import packages from co2_project_methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_local/tutorial.html#1.Data">1.Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#1.0-Import-Echem-Data">1.0 Import Echem Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#1.1-Import-Gas-Data">1.1 Import Gas Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#1.2-Combine-Data">1.2 Combine Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_local/tutorial.html#2.Calculation">2.Calculation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#2.0-Calculate-amount-of-CO2-captured-and-released-for-each-cycle">2.0 Calculate amount of CO2 captured and released for each cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#2.1-Calculate-DIC-according-to-total_df,-ehcem_time_df-and-change_gas_df">2.1 Calculate DIC according to total_df, ehcem_time_df and change_gas_df</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_local/tutorial.html#3.Plotting">3.Plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#3.0-Plot-all-gas-and-echem-data">3.0 Plot all gas and echem data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#3.1-plot-each-echem-process’-start-and-end-time">3.1 plot each echem process’ start and end time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#3.2-Plot-Baseline-for-CO2-capture/release">3.2 Plot Baseline for CO2 capture/release</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#3.3-Plot-Energy-Cost">3.3 Plot Energy Cost</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_local/tutorial.html#3.4-Plot-DIC-vs. pH">3.4 Plot DIC vs. pH</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Help.html">Help</a></li>
 </ul>

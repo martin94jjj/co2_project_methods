@@ -1,0 +1,8 @@
+1. Write comments of code carefully
+
+2. Prepare example in tutorial_local/tutorial.ipynb
+	Be careful with the title name and number of #
+
+3. Once finish updating code,comments and example, run **make html** under /docs folder
+
+4. Push the latest data to git repo

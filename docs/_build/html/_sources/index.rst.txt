@@ -6,6 +6,11 @@
 Documentation for co2_project_methods
 ===============================================
 
+.. image:: images/co2_exp_setup.png
+    :align: center
+    :width: 600px
+    :alt: alternate text
+
 Welcome to use co2_project_methods. This package contain modules that help you analyze data for electrochemical pH swing CO2 capture/release experiemnts.
 
 1 E-Chem module: help you analyze electrochemical data, such as voltage, current and pH data recorded by a Gamry Potentiostat.
@@ -19,14 +24,18 @@ Welcome to use co2_project_methods. This package contain modules that help you a
 5 Plotting Methods: Provide easy presentation of the analyzed data.
 
 
-Use Package: Clone https://github.com/martin94jjj/co2_project_methods.git 
+**Use Package**: Clone https://github.com/martin94jjj/co2_project_methods.git 
+
+.. Note::
+
+   Please cite Jin *et al.*, *Energy Environ. Sci.*, 2020,13, 3706-3722 if you use this package to analyze your data.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    modules 
-   Tutorial
+   ./tutorial_local/tutorial.ipynb
    License
    Help
 

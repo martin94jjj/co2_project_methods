@@ -1,0 +1,1999 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Tutorial &mdash; co2_project_methods 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License" href="../License.html" />
+    <link rel="prev" title="utils module" href="../utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> co2_project_methods
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">co2_project_methods</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#0.Import-packages">0.Import packages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#0.0-Import-common-python-packges">0.0 Import common python packges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#0.1-Import-packages-from-co2_project_methods">0.1 Import packages from co2_project_methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#1.Data">1.Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#1.0-Import-Echem-Data">1.0 Import Echem Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#1.1-Import-Gas-Data">1.1 Import Gas Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#1.2-Combine-Data">1.2 Combine Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#2.Calculation">2.Calculation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#2.0-Calculate-amount-of-CO2-captured-and-released-for-each-cycle">2.0 Calculate amount of CO2 captured and released for each cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.1-Calculate-DIC-according-to-total_df,-ehcem_time_df-and-change_gas_df">2.1 Calculate DIC according to total_df, ehcem_time_df and change_gas_df</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#3.Plotting">3.Plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#3.0-Plot-all-gas-and-echem-data">3.0 Plot all gas and echem data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#3.1-plot-each-echem-process’-start-and-end-time">3.1 plot each echem process’ start and end time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#3.2-Plot-Baseline-for-CO2-capture/release">3.2 Plot Baseline for CO2 capture/release</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#3.2.0-Capture">3.2.0 Capture</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#3.2.1-Release">3.2.1 Release</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#3.3-Plot-Energy-Cost">3.3 Plot Energy Cost</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#3.4-Plot-DIC-vs. pH">3.4 Plot DIC vs. pH</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../License.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Help.html">Help</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">co2_project_methods</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/tutorial_local/tutorial.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Tutorial">
+<h1>Tutorial<a class="headerlink" href="#Tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="0.Import-packages">
+<h2>0.Import packages<a class="headerlink" href="#0.Import-packages" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="0.0-Import-common-python-packges">
+<h3>0.0 Import common python packges<a class="headerlink" href="#0.0-Import-common-python-packges" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">### INTRODUCTION                       ###</span>
+<span class="c1">### AUTHOR: Martin Jin                 ###</span>
+<span class="c1">### Date: 20210127                     ###</span>
+
+<span class="c1">#A Method to summarize electrochemistry, CO2 and flow meter data.</span>
+<span class="c1">#enter folder/file path to start</span>
+<span class="c1">#for 20210107 data</span>
+
+
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MultipleLocator</span>
+<span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">fft</span><span class="p">,</span><span class="n">ifft</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">lfilter</span><span class="p">,</span><span class="n">savgol_filter</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fsolve</span><span class="p">,</span><span class="n">root_scalar</span><span class="p">,</span><span class="n">ridder</span><span class="p">,</span><span class="n">anderson</span><span class="p">,</span><span class="n">newton_krylov</span>
+
+<span class="c1">#set minor ticks</span>
+<span class="n">ml</span> <span class="o">=</span> <span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1">#A Method to summarize electrochemistry, CO2 and flow meter data.</span>
+
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="0.1-Import-packages-from-co2_project_methods">
+<h3>0.1 Import packages from co2_project_methods<a class="headerlink" href="#0.1-Import-packages-from-co2_project_methods" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+
+
+
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="c1"># insert at 1, 0 is the script path (or &#39;&#39; in REPL)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;../../&#39;</span><span class="p">)</span>
+
+<span class="c1">#import all custom function modules</span>
+<span class="kn">import</span> <span class="nn">echem_methods</span>
+<span class="kn">import</span> <span class="nn">gas_methods</span>
+<span class="kn">import</span> <span class="nn">utils</span>
+<span class="kn">import</span> <span class="nn">calc_dic</span>
+<span class="kn">import</span> <span class="nn">plotting</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="1.Data">
+<h2>1.Data<a class="headerlink" href="#1.Data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="1.0-Import-Echem-Data">
+<h3>1.0 Import Echem Data<a class="headerlink" href="#1.0-Import-Echem-Data" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#Import and Process Echem Data</span>
+<span class="n">electrochem_path_40mA</span> <span class="o">=</span> <span class="s1">&#39;Electrochemistry/20210211 3hr_switch 40mAcm2 right CO2 test/&#39;</span>
+<span class="n">echem_40_ma_dict</span> <span class="o">=</span> <span class="n">echem_methods</span><span class="o">.</span><span class="n">create_echem_dfs</span><span class="p">(</span><span class="n">electrochem_path_40mA</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">outgas_time</span><span class="o">=</span><span class="mi">163</span><span class="p">)</span>
+<span class="n">echem_40_ma_energy_df</span> <span class="o">=</span> <span class="n">echem_40_ma_dict</span><span class="p">[</span><span class="s1">&#39;energy_df&#39;</span><span class="p">]</span>
+<span class="n">echem_40_df</span> <span class="o">=</span> <span class="n">echem_40_ma_dict</span><span class="p">[</span><span class="s1">&#39;echem_df&#39;</span><span class="p">]</span>
+<span class="n">time_40_df</span> <span class="o">=</span> <span class="n">echem_40_ma_dict</span><span class="p">[</span><span class="s1">&#39;time_df&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">echem_40_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Time</th>
+      <th>Voltage</th>
+      <th>Current</th>
+      <th>pH_left</th>
+      <th>pH_right</th>
+      <th>fitted_pH_left</th>
+      <th>fitted_pH_right</th>
+      <th>Delta_T_s</th>
+      <th>Time_Delta</th>
+      <th>Hours</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2021-02-11 16:19:36</td>
+      <td>0.603859</td>
+      <td>0.199853</td>
+      <td>8.897782</td>
+      <td>6.418614</td>
+      <td>9.215425</td>
+      <td>6.321130</td>
+      <td>1.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2021-02-11 16:19:37</td>
+      <td>0.726290</td>
+      <td>0.199854</td>
+      <td>9.859904</td>
+      <td>6.428022</td>
+      <td>9.221637</td>
+      <td>6.335298</td>
+      <td>2.0</td>
+      <td>0.000278</td>
+      <td>0.000278</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2021-02-11 16:19:38</td>
+      <td>0.797950</td>
+      <td>0.199854</td>
+      <td>9.248463</td>
+      <td>6.428972</td>
+      <td>9.227791</td>
+      <td>6.349404</td>
+      <td>3.0</td>
+      <td>0.000556</td>
+      <td>0.000556</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2021-02-11 16:19:39</td>
+      <td>0.837222</td>
+      <td>0.199854</td>
+      <td>9.010238</td>
+      <td>6.430870</td>
+      <td>9.233886</td>
+      <td>6.363450</td>
+      <td>4.0</td>
+      <td>0.000833</td>
+      <td>0.000833</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2021-02-11 16:19:40</td>
+      <td>0.861303</td>
+      <td>0.199854</td>
+      <td>9.240014</td>
+      <td>6.439076</td>
+      <td>9.239923</td>
+      <td>6.377435</td>
+      <td>5.0</td>
+      <td>0.001111</td>
+      <td>0.001111</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="1.1-Import-Gas-Data">
+<h3>1.1 Import Gas Data<a class="headerlink" href="#1.1-Import-Gas-Data" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+
+<span></span><span class="c1">#Import and Process Gas Data</span>
+<span class="n">gas_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;CO2Flow/20210211_Full_cell_right_CO2_3hr_switch_cycling_left_peristaltic_pump_additional_390mgDSPZ.txt&quot;</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">echem_40_df</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gas_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>time</th>
+      <th>loop_num</th>
+      <th>N2 input left(abs val)</th>
+      <th>N2 input right(abs val)</th>
+      <th>CO2 input left(abs val)</th>
+      <th>CO2 input right(abs val)</th>
+      <th>flow sensor left(sccm)</th>
+      <th>flow sensor right(sccm)</th>
+      <th>CO2 sensor left(abs val)</th>
+      <th>CO2 sensor right(abs val)</th>
+      <th>Datetime</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>02/11/2021</td>
+      <td>15:19:35</td>
+      <td>0</td>
+      <td>100</td>
+      <td>50</td>
+      <td>0</td>
+      <td>50</td>
+      <td>19.54</td>
+      <td>2.90</td>
+      <td>6.0</td>
+      <td>556.0</td>
+      <td>2021-02-11 15:19:35</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>02/11/2021</td>
+      <td>15:19:36</td>
+      <td>0</td>
+      <td>100</td>
+      <td>50</td>
+      <td>0</td>
+      <td>50</td>
+      <td>19.42</td>
+      <td>2.54</td>
+      <td>7.0</td>
+      <td>552.0</td>
+      <td>2021-02-11 15:19:36</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>02/11/2021</td>
+      <td>15:19:37</td>
+      <td>0</td>
+      <td>100</td>
+      <td>50</td>
+      <td>0</td>
+      <td>50</td>
+      <td>15.38</td>
+      <td>3.27</td>
+      <td>8.0</td>
+      <td>553.0</td>
+      <td>2021-02-11 15:19:37</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>02/11/2021</td>
+      <td>15:19:38</td>
+      <td>0</td>
+      <td>100</td>
+      <td>50</td>
+      <td>0</td>
+      <td>50</td>
+      <td>28.71</td>
+      <td>1.56</td>
+      <td>9.0</td>
+      <td>547.0</td>
+      <td>2021-02-11 15:19:38</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>02/11/2021</td>
+      <td>15:19:39</td>
+      <td>0</td>
+      <td>100</td>
+      <td>50</td>
+      <td>0</td>
+      <td>50</td>
+      <td>20.64</td>
+      <td>2.90</td>
+      <td>5.0</td>
+      <td>546.0</td>
+      <td>2021-02-11 15:19:39</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="1.2-Combine-Data">
+<h3>1.2 Combine Data<a class="headerlink" href="#1.2-Combine-Data" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+
+<span></span><span class="c1">#Combine Data</span>
+<span class="n">total_df</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">merge_echem_gas_df</span><span class="p">(</span><span class="n">echem_40_df</span><span class="p">,</span><span class="n">gas_df</span><span class="p">,</span><span class="n">co2_fit_path</span> <span class="o">=</span> <span class="s1">&#39;20210103_right_CO2_sensor_cubic_spline_fit&#39;</span><span class="p">)</span>
+
+<span class="n">change_gas_df</span> <span class="o">=</span> <span class="n">gas_methods</span><span class="o">.</span><span class="n">find_gas_change_time</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">gas_switch_period</span><span class="o">=</span><span class="mi">10800</span><span class="p">)</span>
+
+
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">total_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>time</th>
+      <th>loop_num</th>
+      <th>N2 input left(abs val)</th>
+      <th>N2 input right(abs val)</th>
+      <th>CO2 input left(abs val)</th>
+      <th>CO2 input right(abs val)</th>
+      <th>flow sensor left(sccm)</th>
+      <th>flow sensor right(sccm)</th>
+      <th>CO2 sensor left(abs val)</th>
+      <th>...</th>
+      <th>Current</th>
+      <th>pH_left</th>
+      <th>pH_right</th>
+      <th>fitted_pH_left</th>
+      <th>fitted_pH_right</th>
+      <th>Delta_T_s</th>
+      <th>Hours</th>
+      <th>right_pco2</th>
+      <th>Corrected_Flow_Right</th>
+      <th>Corrected_Flow_Right_filtered</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>02/11/2021</td>
+      <td>15:19:35</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>50.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>19.54</td>
+      <td>2.90</td>
+      <td>6.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>1.98650</td>
+      <td>0.036107</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>02/11/2021</td>
+      <td>15:19:36</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>50.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>19.42</td>
+      <td>2.54</td>
+      <td>7.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>1.73990</td>
+      <td>0.067464</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>02/11/2021</td>
+      <td>15:19:37</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>50.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>15.38</td>
+      <td>3.27</td>
+      <td>8.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>2.23995</td>
+      <td>0.107589</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>02/11/2021</td>
+      <td>15:19:38</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>50.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>28.71</td>
+      <td>1.56</td>
+      <td>9.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>1.06860</td>
+      <td>0.126353</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>02/11/2021</td>
+      <td>15:19:39</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>50.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>20.64</td>
+      <td>2.90</td>
+      <td>5.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>1.98650</td>
+      <td>0.161384</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 25 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">change_gas_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cycle</th>
+      <th>low_to_high</th>
+      <th>high_to_low</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2021-02-11 18:20:02</td>
+      <td>2021-02-11 21:20:28</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>2021-02-12 00:20:55</td>
+      <td>2021-02-12 03:21:22</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>2021-02-12 06:21:48</td>
+      <td>2021-02-12 09:22:15</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>2021-02-12 12:22:41</td>
+      <td>2021-02-12 15:23:08</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>2021-02-12 18:23:34</td>
+      <td>2021-02-12 21:24:01</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>2021-02-13 00:24:27</td>
+      <td>NaT</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="2.Calculation">
+<h2>2.Calculation<a class="headerlink" href="#2.Calculation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="2.0-Calculate-amount-of-CO2-captured-and-released-for-each-cycle">
+<h3>2.0 Calculate amount of CO2 captured and released for each cycle<a class="headerlink" href="#2.0-Calculate-amount-of-CO2-captured-and-released-for-each-cycle" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">amount_3000Baseline_df</span> <span class="o">=</span> <span class="n">gas_methods</span><span class="o">.</span><span class="n">calculate_amount</span><span class="p">(</span><span class="n">total_df</span><span class="p">,</span><span class="n">time_40_df</span><span class="p">,</span><span class="n">change_gas_df</span><span class="p">,</span><span class="n">capture_parameter</span> <span class="o">=</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">,</span><span class="n">baseline_range</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">amount_3000Baseline_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cycle_Number</th>
+      <th>Capture_Amount</th>
+      <th>Outgas_Amount</th>
+      <th>Average_Amount</th>
+      <th>c0</th>
+      <th>c1</th>
+      <th>o0</th>
+      <th>o1</th>
+      <th>c_start</th>
+      <th>c_end</th>
+      <th>o_start</th>
+      <th>o_end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>-59.360046</td>
+      <td>45.428678</td>
+      <td>52.394362</td>
+      <td>0.003741</td>
+      <td>10.889300</td>
+      <td>-0.025314</td>
+      <td>10.154904</td>
+      <td>3591</td>
+      <td>10802</td>
+      <td>14451</td>
+      <td>21604</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>-53.423953</td>
+      <td>47.242824</td>
+      <td>50.333389</td>
+      <td>0.015037</td>
+      <td>10.713154</td>
+      <td>-0.052972</td>
+      <td>10.612816</td>
+      <td>25262</td>
+      <td>32406</td>
+      <td>36095</td>
+      <td>43208</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>-50.176936</td>
+      <td>45.080388</td>
+      <td>47.628662</td>
+      <td>-0.004292</td>
+      <td>10.861044</td>
+      <td>-0.027326</td>
+      <td>10.494254</td>
+      <td>46900</td>
+      <td>54009</td>
+      <td>57686</td>
+      <td>64811</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>-50.915158</td>
+      <td>45.390502</td>
+      <td>48.152830</td>
+      <td>0.013501</td>
+      <td>10.507792</td>
+      <td>-0.045379</td>
+      <td>11.072978</td>
+      <td>68459</td>
+      <td>75612</td>
+      <td>79291</td>
+      <td>86414</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>-51.009255</td>
+      <td>45.919220</td>
+      <td>48.464237</td>
+      <td>0.026548</td>
+      <td>10.114267</td>
+      <td>-0.039299</td>
+      <td>11.186749</td>
+      <td>90083</td>
+      <td>97215</td>
+      <td>100879</td>
+      <td>108017</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="2.1-Calculate-DIC-according-to-total_df,-ehcem_time_df-and-change_gas_df">
+<h3>2.1 Calculate DIC according to total_df, ehcem_time_df and change_gas_df<a class="headerlink" href="#2.1-Calculate-DIC-according-to-total_df,-ehcem_time_df-and-change_gas_df" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dic_df</span> <span class="o">=</span> <span class="n">calc_dic</span><span class="o">.</span><span class="n">calc_DIC</span><span class="p">(</span><span class="n">total_df</span><span class="p">,</span><span class="n">time_40_df</span><span class="p">,</span><span class="n">change_gas_df</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dic_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cycle</th>
+      <th>State</th>
+      <th>pH_measured</th>
+      <th>pH_theory</th>
+      <th>TA</th>
+      <th>DIC_TA</th>
+      <th>DIC_eq</th>
+      <th>DIC_theory</th>
+      <th>index</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>3'i</td>
+      <td>6.418614</td>
+      <td>6.418614</td>
+      <td>0.050580</td>
+      <td>0.068026</td>
+      <td>0.068026</td>
+      <td>0.068026</td>
+      <td>3592</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>7.505919</td>
+      <td>6.851640608245976</td>
+      <td>0.275185</td>
+      <td>0.279265</td>
+      <td>1.285404</td>
+      <td>0.309388</td>
+      <td>10802</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>1'</td>
+      <td>7.245702</td>
+      <td>6.851308386628657</td>
+      <td>0.274973</td>
+      <td>0.287011</td>
+      <td>0.717789</td>
+      <td>0.309177</td>
+      <td>14451</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>3</td>
+      <td>6.462063</td>
+      <td>6.5362073280691195</td>
+      <td>0.066353</td>
+      <td>0.087041</td>
+      <td>0.073348</td>
+      <td>0.083760</td>
+      <td>21604</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>3'f</td>
+      <td>6.733489</td>
+      <td>6.536193931393215</td>
+      <td>0.066351</td>
+      <td>0.077297</td>
+      <td>0.121944</td>
+      <td>0.083758</td>
+      <td>25239</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>2</td>
+      <td>3'i</td>
+      <td>6.736348</td>
+      <td>6.736348</td>
+      <td>0.105370</td>
+      <td>0.122635</td>
+      <td>0.122635</td>
+      <td>0.122635</td>
+      <td>25263</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>2</td>
+      <td>1</td>
+      <td>7.340558</td>
+      <td>6.92140707111922</td>
+      <td>0.323466</td>
+      <td>0.333799</td>
+      <td>0.885945</td>
+      <td>0.357367</td>
+      <td>32406</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>2</td>
+      <td>1'</td>
+      <td>7.170335</td>
+      <td>6.9200101427109</td>
+      <td>0.322421</td>
+      <td>0.340051</td>
+      <td>0.608355</td>
+      <td>0.356329</td>
+      <td>36095</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2</td>
+      <td>3</td>
+      <td>6.308327</td>
+      <td>6.776578093885727</td>
+      <td>0.115646</td>
+      <td>0.167154</td>
+      <td>0.056685</td>
+      <td>0.132864</td>
+      <td>43208</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2</td>
+      <td>3'f</td>
+      <td>6.588679</td>
+      <td>6.776558678328582</td>
+      <td>0.115640</td>
+      <td>0.142474</td>
+      <td>0.092283</td>
+      <td>0.132859</td>
+      <td>46878</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>3</td>
+      <td>3'i</td>
+      <td>6.830009</td>
+      <td>6.830009</td>
+      <td>0.130870</td>
+      <td>0.148009</td>
+      <td>0.148009</td>
+      <td>0.148009</td>
+      <td>46901</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>3</td>
+      <td>1</td>
+      <td>7.334442</td>
+      <td>6.94558949189575</td>
+      <td>0.342122</td>
+      <td>0.353293</td>
+      <td>0.873941</td>
+      <td>0.375893</td>
+      <td>54009</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>3</td>
+      <td>1'</td>
+      <td>7.187547</td>
+      <td>6.943221808801877</td>
+      <td>0.340249</td>
+      <td>0.357961</td>
+      <td>0.631680</td>
+      <td>0.374033</td>
+      <td>57686</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>3</td>
+      <td>3</td>
+      <td>6.539820</td>
+      <td>6.861440344237209</td>
+      <td>0.140751</td>
+      <td>0.177365</td>
+      <td>0.084314</td>
+      <td>0.157834</td>
+      <td>64811</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>3</td>
+      <td>3'f</td>
+      <td>6.808290</td>
+      <td>6.861437506024068</td>
+      <td>0.140746</td>
+      <td>0.160168</td>
+      <td>0.141626</td>
+      <td>0.157833</td>
+      <td>68437</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>4</td>
+      <td>3'i</td>
+      <td>6.791529</td>
+      <td>6.791529</td>
+      <td>0.119718</td>
+      <td>0.136915</td>
+      <td>0.136915</td>
+      <td>0.136915</td>
+      <td>68460</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>4</td>
+      <td>1</td>
+      <td>7.513157</td>
+      <td>6.936743360666748</td>
+      <td>0.335175</td>
+      <td>0.339917</td>
+      <td>1.306696</td>
+      <td>0.368996</td>
+      <td>75612</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>4</td>
+      <td>1'</td>
+      <td>7.209551</td>
+      <td>6.933257466378527</td>
+      <td>0.332477</td>
+      <td>0.348709</td>
+      <td>0.662896</td>
+      <td>0.366316</td>
+      <td>79291</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>4</td>
+      <td>3</td>
+      <td>6.433915</td>
+      <td>6.8254765579792815</td>
+      <td>0.129500</td>
+      <td>0.172607</td>
+      <td>0.069839</td>
+      <td>0.146651</td>
+      <td>86414</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>4</td>
+      <td>3'f</td>
+      <td>6.725550</td>
+      <td>6.825448874729407</td>
+      <td>0.129496</td>
+      <td>0.151266</td>
+      <td>0.120048</td>
+      <td>0.146643</td>
+      <td>90061</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>5</td>
+      <td>3'i</td>
+      <td>6.845143</td>
+      <td>6.845143</td>
+      <td>0.135538</td>
+      <td>0.152651</td>
+      <td>0.152651</td>
+      <td>0.152651</td>
+      <td>90084</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>5</td>
+      <td>1</td>
+      <td>7.520362</td>
+      <td>6.94969192540814</td>
+      <td>0.345393</td>
+      <td>0.350047</td>
+      <td>1.328256</td>
+      <td>0.379140</td>
+      <td>97215</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>5</td>
+      <td>1'</td>
+      <td>7.096323</td>
+      <td>6.94526179694325</td>
+      <td>0.341862</td>
+      <td>0.364774</td>
+      <td>0.518059</td>
+      <td>0.375635</td>
+      <td>100879</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>5</td>
+      <td>3</td>
+      <td>6.597446</td>
+      <td>6.873951332533366</td>
+      <td>0.144890</td>
+      <td>0.177829</td>
+      <td>0.093810</td>
+      <td>0.161948</td>
+      <td>108017</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>5</td>
+      <td>3'f</td>
+      <td>6.885565</td>
+      <td>6.87393240411574</td>
+      <td>0.144884</td>
+      <td>0.161465</td>
+      <td>0.165875</td>
+      <td>0.161942</td>
+      <td>111625</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="3.Plotting">
+<h2>3.Plotting<a class="headerlink" href="#3.Plotting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="3.0-Plot-all-gas-and-echem-data">
+<h3>3.0 Plot all gas and echem data<a class="headerlink" href="#3.0-Plot-all-gas-and-echem-data" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+
+<span></span><span class="n">size</span><span class="o">=</span><span class="mi">23</span>
+
+<span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span> <span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;hspace&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">})</span>
+
+
+<span class="c1">#ax[0].set_xlabel(&quot;Date Time (Day Hour:Minute)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="o">.</span><span class="n">Voltage</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#00ECC2&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax[0].set_xlim(starting_time-delta,ending_time-delta)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax[0].set_ylim(-10,110)</span>
+<span class="c1">#ax[0].set_xlabel(&quot;Time (Time)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Voltage ($V$)&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="o">.</span><span class="n">Current</span><span class="o">/</span><span class="mi">5</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;#0078FF&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax[1].set_xlim(starting_time-delta,ending_time-delta)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax[0].set_ylim(-10,110)</span>
+<span class="c1">#ax[1].set_xlabel(&quot;Time (Time)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Current density ($A/cm^</span><span class="si">{2}</span><span class="s2">$)&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="o">.</span><span class="n">pH_left</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FFD75F&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax[2].set_xlim(starting_time-delta,ending_time-delta)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">14</span><span class="p">)</span>
+<span class="c1">#ax[2].set_xlabel(&quot;Time(Time)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Pos pH&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="o">.</span><span class="n">pH_right</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FF8A25&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax[3].tick_params(axis=&#39;x&#39;, rotation=45)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Neg pH&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;CO2 input right(abs val)&#39;</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FF4359&#39;</span><span class="p">)</span>
+<span class="c1">#ax[3].tick_params(axis=&#39;x&#39;, rotation=45)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$CO_2$ Control&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">80</span><span class="p">,</span><span class="mi">100</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#639C0A&#39;</span><span class="p">)</span>
+<span class="c1">#ax[3].tick_params(axis=&#39;x&#39;, rotation=45)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$pCO_2$ (bar)&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.6</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">1.0</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">80</span>  <span class="c1"># the larger n is, the smoother curve will be</span>
+<span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1">#filtered_right = lfilter(b,a,total_df[&#39;flow sensor right(sccm)&#39;])</span>
+<span class="c1">#total_df[&#39;right_pco2&#39;] = total_df[&#39;right_pco2&#39;].apply(lambda x: np.where(x&gt;0.9,1,x))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="o">.</span><span class="n">Corrected_Flow_Right_filtered</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#22F08A&#39;</span><span class="p">,</span><span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;filtered&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="o">.</span><span class="n">Corrected_Flow_Right</span><span class="p">,</span><span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;original&#39;</span><span class="p">)</span>
+
+<span class="c1">#ax[6].tick_params(axis=&#39;x&#39;, rotation=45)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Flow (sccm)&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">25</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (Hours)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 0, &#39;Time (Hours)&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorial_local_tutorial_26_1.png" src="../_images/tutorial_local_tutorial_26_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="3.1-plot-each-echem-process’-start-and-end-time">
+<h3>3.1 plot each echem process’ start and end time<a class="headerlink" href="#3.1-plot-each-echem-process’-start-and-end-time" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ml</span> <span class="o">=</span> <span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">5.941</span><span class="p">,</span><span class="mf">4.630</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">Time_Delta</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right_filtered&#39;</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#22F08A&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">time_40_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">column</span> <span class="o">!=</span> <span class="s1">&#39;Cycle&#39;</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">((</span><span class="n">time_40_df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">-</span><span class="n">total_df</span><span class="o">.</span><span class="n">Datetime</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">days</span><span class="o">*</span><span class="mi">24</span><span class="o">+</span><span class="n">x</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mi">3600</span><span class="p">),</span><span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">ymax</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span><span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+<span class="c1">#plt.ylim(-2,3)</span>
+<span class="c1">#plt.xlim(0,12)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;flow rate (sccm)&#39;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+No handles with labels found to put in legend.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorial_local_tutorial_28_1.png" src="../_images/tutorial_local_tutorial_28_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="3.2-Plot-Baseline-for-CO2-capture/release">
+<h3>3.2 Plot Baseline for CO2 capture/release<a class="headerlink" href="#3.2-Plot-Baseline-for-CO2-capture/release" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="3.2.0-Capture">
+<h4>3.2.0 Capture<a class="headerlink" href="#3.2.0-Capture" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plotting</span><span class="o">.</span><span class="n">plot_baseline</span><span class="p">(</span><span class="n">amount_3000Baseline_df</span><span class="p">,</span><span class="n">total_df</span> <span class="o">=</span> <span class="n">total_df</span><span class="p">,</span><span class="n">cycle</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">capture</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">baseline_range</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;6000 points baseline&#39;</span><span class="p">,</span><span class="n">ymin</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">ymax</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorial_local_tutorial_31_0.png" src="../_images/tutorial_local_tutorial_31_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="3.2.1-Release">
+<h4>3.2.1 Release<a class="headerlink" href="#3.2.1-Release" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plotting</span><span class="o">.</span><span class="n">plot_baseline</span><span class="p">(</span><span class="n">amount_3000Baseline_df</span><span class="p">,</span><span class="n">total_df</span> <span class="o">=</span> <span class="n">total_df</span><span class="p">,</span><span class="n">cycle</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">capture</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">baseline_range</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;6000 points baseline&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorial_local_tutorial_33_0.png" src="../_images/tutorial_local_tutorial_33_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="3.3-Plot-Energy-Cost">
+<h3>3.3 Plot Energy Cost<a class="headerlink" href="#3.3-Plot-Energy-Cost" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energy_co2_40ma_df</span> <span class="o">=</span> <span class="n">echem_40_ma_energy_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">amount_3000Baseline_df</span><span class="p">)</span>
+<span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Charge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Capture_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;cycle_work(kJ/molCO2)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)&#39;</span><span class="p">]</span>
+<span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;co2_captured/electron&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Capture_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Charge_Capacity&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">96485</span><span class="p">)</span>
+<span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;co2_released/electron&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Capacity&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">96485</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">5.941</span><span class="p">,</span><span class="mf">4.630</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;hspace&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">})</span>
+
+<span class="n">size</span><span class="o">=</span><span class="mi">15</span>
+<span class="n">legend_size</span><span class="o">=</span><span class="mi">11</span>
+<span class="c1">#ax[0].set_xlabel(&quot;Date Time (Day Hour:Minute)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Charge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.95</span><span class="o">/</span><span class="mf">24.01</span><span class="p">)),</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FF8357&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;3-hr $ w_{deacidification, CO_2}$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.95</span><span class="o">/</span><span class="mf">24.01</span><span class="p">)),</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FAC172&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;3-hr $ w_{acidification, CO_2}$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Energy&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Charge_Energy&#39;</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.95</span><span class="o">/</span><span class="mf">24.01</span><span class="p">)),</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#89D5C9&#39;</span><span class="p">,</span><span class="n">label</span> <span class="o">=</span><span class="s1">&#39;3-hr $w_{cycle, CO_2}$&#39;</span><span class="p">)</span>
+
+
+<span class="c1">#ax[0].set_xlim(starting_time-delta,ending_time-delta)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
+<span class="c1">#ax[0].set_xlabel(&quot;Time (hours)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Energy $kJ/mol_</span><span class="si">{CO_2}</span><span class="s2">$&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax.set_xticks([0,5,10,15,20])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Cycle number&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="n">legend_size</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorial_local_tutorial_36_0.png" src="../_images/tutorial_local_tutorial_36_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="3.4-Plot-DIC-vs. pH">
+<h3>3.4 Plot DIC vs. pH<a class="headerlink" href="#3.4-Plot-DIC-vs. pH" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+
+<span></span><span class="c1">#Choose a single cycle to plot DIC</span>
+<span class="n">cycle_2_dic</span> <span class="o">=</span> <span class="n">dic_df</span><span class="p">[</span><span class="n">dic_df</span><span class="p">[</span><span class="s1">&#39;Cycle&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="n">exp_dic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cycle_2_dic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;DIC_TA&#39;</span><span class="p">],</span>
+                                     <span class="n">cycle_2_dic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;DIC_TA&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Capture_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mf">0.011</span><span class="p">),</span>
+                                    <span class="p">(</span><span class="n">cycle_2_dic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;DIC_TA&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Capture_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mf">0.011</span><span class="p">))</span><span class="o">/</span><span class="mf">0.33</span><span class="o">*</span><span class="mf">0.34</span><span class="p">,</span>
+                                    <span class="p">(</span><span class="n">cycle_2_dic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;DIC_TA&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Capture_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mf">0.011</span><span class="p">))</span><span class="o">/</span><span class="mf">0.33</span><span class="o">*</span><span class="mf">0.34</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">energy_co2_40ma_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mf">0.011</span><span class="p">),</span>
+                                     <span class="n">cycle_2_dic</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="s1">&#39;DIC_TA&#39;</span><span class="p">]</span>
+                                    <span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">5.941</span><span class="p">,</span><span class="mf">4.630</span><span class="p">),</span><span class="n">dpi</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span><span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;hspace&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">})</span>
+
+<span class="n">size</span><span class="o">=</span><span class="mi">15</span>
+<span class="n">legend_size</span><span class="o">=</span><span class="mi">11</span>
+<span class="c1">#ax[0].set_xlabel(&quot;Date Time (Day Hour:Minute)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cycle_2_dic</span><span class="p">[</span><span class="s1">&#39;pH_theory&#39;</span><span class="p">],</span><span class="n">cycle_2_dic</span><span class="p">[</span><span class="s1">&#39;DIC_theory&#39;</span><span class="p">],</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FF8357&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;$DIC_</span><span class="si">{Theory}</span><span class="s1">$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cycle_2_dic</span><span class="p">[</span><span class="s1">&#39;pH_measured&#39;</span><span class="p">],</span><span class="n">cycle_2_dic</span><span class="p">[</span><span class="s1">&#39;DIC_TA&#39;</span><span class="p">],</span><span class="s1">&#39;v&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FAC172&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;$DIC_</span><span class="si">{TA}</span><span class="s1">$&#39;</span><span class="p">,</span><span class="n">markerfacecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cycle_2_dic</span><span class="p">[</span><span class="s1">&#39;pH_measured&#39;</span><span class="p">],</span><span class="n">exp_dic</span><span class="p">,</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;#89D5C9&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;$DIC_</span><span class="si">{Experimental}</span><span class="s1">$&#39;</span><span class="p">,</span><span class="n">markerfacecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+<span class="c1">#ax[0].set_xlim(starting_time-delta,ending_time-delta)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax.set_ylim(-10,250)</span>
+<span class="c1">#ax[0].set_xlabel(&quot;Time (hours)&quot;,fontsize = 25)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;DIC (M)&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="c1">#ax.set_xticks([0,5,10,15,20])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;pH&quot;</span><span class="p">,</span><span class="n">fontsize</span> <span class="o">=</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="n">legend_size</span><span class="p">,</span><span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorial_local_tutorial_39_0.png" src="../_images/tutorial_local_tutorial_39_0.png" />
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../License.html" class="btn btn-neutral float-right" title="License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../utils.html" class="btn btn-neutral float-left" title="utils module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Martin Jin.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
