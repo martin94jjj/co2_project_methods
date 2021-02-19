@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>echem_methods module &mdash; co2_project_methods 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gas_methods module" href="gas_methods.html" />
+    <link rel="prev" title="calc_dic module" href="calc_dic.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> co2_project_methods
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">co2_project_methods</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="calc_dic.html">calc_dic module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">echem_methods module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gas_methods.html">gas_methods module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html">plotting module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">co2_project_methods</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">co2_project_methods</a> &raquo;</li>
+        
+      <li>echem_methods module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/echem_methods.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-echem_methods">
+<span id="echem-methods-module"></span><h1>echem_methods module<a class="headerlink" href="#module-echem_methods" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="echem_methods.analyze_gamry_file">
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">analyze_gamry_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_date_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#analyze_gamry_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.analyze_gamry_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a Gamry file and the starting time of the first file (e.g. the time of the creation or the last time point of previous half cycle). Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<em>string</em>) – the address of the file</p></li>
+<li><p><strong>starting_date_time</strong> (<em>datetime.datetime</em>) – the initial datetime of the process</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p><strong>dataset</strong> a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.
+dataset -&gt; pandas.DataFrame: a dataset contains the following attributes</p>
+<p>dataset[‘Delta_T_s’] -&gt; float: time in seconds since the start of the process</p>
+<p>dataset[‘Time’] -&gt; datetime.datetime: datetime of the current datum point</p>
+<p>dataset[‘Voltage’] -&gt; float: voltage data</p>
+<p>dataset[‘Current’] -&gt; float: current data</p>
+<p>dataset[‘pH’] -&gt; float: pH data</p>
+<p>dataset[‘fitted_pH’] -&gt; float: fitted pH data. Fluctuations were removed.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="echem_methods.cal_capacity_energy">
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">cal_capacity_energy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#cal_capacity_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.cal_capacity_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a Gamry file folder, utilizes <strong>analyze_gamry_file</strong> to get half-cycle data and
+puts everything together in a dataset with multi-cycle’s cycle capacity,energy and efficiencies.</p>
+<blockquote>
+<div><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The folder structure must be like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>path-to-folder
+├── CHARGE_DISCHARGE
+│   ├── PWRCHARGE_#1.DTA
+│   ├── PWRCHARGE_#2.DTA
+│   ├── PWRCHARGE_#3.DTA
+│   ├── PWRCHARGE_#4.DTA
+│   ├── PWRCHARGE_#5.DTA
+│   ├── PWRDISCHARGE_#1.DTA
+│   ├── PWRDISCHARGE_#2.DTA
+│   ├── PWRDISCHARGE_#3.DTA
+│   ├── PWRDISCHARGE_#4.DTA
+│   └── PWRDISCHARGE_#5.DTA
+└── OTHER
+    ├── Invasion_#1.DTA
+    ├── Invasion_#2.DTA
+    ├── Invasion_#3.DTA
+    ├── Invasion_#4.DTA
+    ├── Invasion_#5.DTA
+    ├── Outgas_#1.DTA
+    ├── Outgas_#2.DTA
+    ├── Outgas_#3.DTA
+    ├── Outgas_#4.DTA
+    └── Outgas_#5.DTA
+</pre></div>
+</div>
+<p>Make sure sub-folder name and file names are identical to the names in the example.</p>
+</div>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<em>string</em>) – file path and name</p></li>
+<li><p><strong>cycle_number</strong> (<em>int</em>) – number of full electrochemical cycles performed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p><strong>dataset</strong> a dataset that containts multi-cycle’s cycle capacity,energy and efficiencies.</p>
+<p>dataset[‘Cycle’] -&gt; datetime.datetime: datetime of the current datum point</p>
+<p>dataset[‘Charge_Capacity’] -&gt; float: charge capacity</p>
+<p>dataset[‘Charge_Energy’] -&gt; float: charge energy</p>
+<p>dataset[‘Discharge_Capacity’] -&gt; float: discharge capacity</p>
+<p>dataset[‘Discharge_Energy’] -&gt; float: discharge energy</p>
+<p>dataset[‘Coulombic_Efficiency’] -&gt; float: coulombic energy</p>
+<p>dataset[‘Energy_Efficiency’] -&gt; float: round-trip energy efficiency</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="echem_methods.create_echem_dfs">
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">create_echem_dfs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">107</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#create_echem_dfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.create_echem_dfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine the results of <strong>read_echem</strong>, <strong>cal_capacity_energy</strong>,
+and <strong>find_echem_time_period</strong> to produce a dictionary of the three dfs.</p>
+<blockquote>
+<div><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The folder structure must be like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>path-to-folder
+├── CHARGE_DISCHARGE
+│   ├── PWRCHARGE_#1.DTA
+│   ├── PWRCHARGE_#2.DTA
+│   ├── PWRCHARGE_#3.DTA
+│   ├── PWRCHARGE_#4.DTA
+│   ├── PWRCHARGE_#5.DTA
+│   ├── PWRDISCHARGE_#1.DTA
+│   ├── PWRDISCHARGE_#2.DTA
+│   ├── PWRDISCHARGE_#3.DTA
+│   ├── PWRDISCHARGE_#4.DTA
+│   └── PWRDISCHARGE_#5.DTA
+└── OTHER
+    ├── Invasion_#1.DTA
+    ├── Invasion_#2.DTA
+    ├── Invasion_#3.DTA
+    ├── Invasion_#4.DTA
+    ├── Invasion_#5.DTA
+    ├── Outgas_#1.DTA
+    ├── Outgas_#2.DTA
+    ├── Outgas_#3.DTA
+    ├── Outgas_#4.DTA
+    └── Outgas_#5.DTA
+</pre></div>
+</div>
+<p>Make sure sub-folder name and file names are identical to the names in the example.</p>
+</div>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>string</em>) – the address of the folder that contains the electrochemistry files.</p></li>
+<li><p><strong>co2</strong> (<em>boolean</em>) – whether CO2 capture/release took place</p></li>
+<li><p><strong>outgas_time</strong> (<em>float</em>) – time in minutes for the outgas period</p></li>
+<li><p><strong>cycle_number</strong> (<em>int</em>) – number of cycles</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>dict</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a dictionary of echem_df,energy_df and time_df</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="echem_methods.find_date_time">
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">find_date_time</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#find_date_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.find_date_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a Gamry file, finds its creation datetime, and returns a datetime variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> (<em>string</em>) – the address of the file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>datetime.datetime</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>starting_date_time</strong>: the datetime that the Gamry file was created(when this electrochemical method starts).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="echem_methods.find_echem_time_period">
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">find_echem_time_period</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#find_echem_time_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.find_echem_time_period" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utilizes <cite>find_date_time method</cite>, reads a Gamry folder and returns a dataset containing the start and end time
+of deacidification, capture, acidification and outgas.</p>
+<blockquote>
+<div><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The folder structure must be like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>path-to-folder
+├── CHARGE_DISCHARGE
+│   ├── PWRCHARGE_#1.DTA
+│   ├── PWRCHARGE_#2.DTA
+│   ├── PWRCHARGE_#3.DTA
+│   ├── PWRCHARGE_#4.DTA
+│   ├── PWRCHARGE_#5.DTA
+│   ├── PWRDISCHARGE_#1.DTA
+│   ├── PWRDISCHARGE_#2.DTA
+│   ├── PWRDISCHARGE_#3.DTA
+│   ├── PWRDISCHARGE_#4.DTA
+│   └── PWRDISCHARGE_#5.DTA
+└── OTHER
+    ├── Invasion_#1.DTA
+    ├── Invasion_#2.DTA
+    ├── Invasion_#3.DTA
+    ├── Invasion_#4.DTA
+    ├── Invasion_#5.DTA
+    ├── Outgas_#1.DTA
+    ├── Outgas_#2.DTA
+    ├── Outgas_#3.DTA
+    ├── Outgas_#4.DTA
+    └── Outgas_#5.DTA
+</pre></div>
+</div>
+<p>Make sure sub-folder name and file names are identical to the names in the example.</p>
+</div>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>string</em>) – the address of the folder that contains the electrochemistry files.</p></li>
+<li><p><strong>co2</strong> (<em>boolean</em>) – whether CO2 capture/release took place</p></li>
+<li><p><strong>outgas_time</strong> (<em>float</em>) – time in minutes for the outgas period</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>a dataset that contains the start and end time of deacidification, capture, acidification and outgas.
+dataset -&gt; pandas.DataFrame: a dataset that contains the following attributes</p>
+<p>dataset[‘Cycle’] -&gt; int: cycle number</p>
+<p>dataset[‘Charge_Start_Time’] -&gt; datetime.datetime:</p>
+<p>dataset[‘Capture_Start_Time’] -&gt; datetime.datetime</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="echem_methods.read_echem">
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">read_echem</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#read_echem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.read_echem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a Gamry file folder, utilizes <strong>analyze_gamry_file</strong> to get half-cycle data and puts everything together
+in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The folder structure must be like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>path-to-folder
+├── CHARGE_DISCHARGE
+│   ├── PWRCHARGE_#1.DTA
+│   ├── PWRCHARGE_#2.DTA
+│   ├── PWRCHARGE_#3.DTA
+│   ├── PWRCHARGE_#4.DTA
+│   ├── PWRCHARGE_#5.DTA
+│   ├── PWRDISCHARGE_#1.DTA
+│   ├── PWRDISCHARGE_#2.DTA
+│   ├── PWRDISCHARGE_#3.DTA
+│   ├── PWRDISCHARGE_#4.DTA
+│   └── PWRDISCHARGE_#5.DTA
+└── OTHER
+    ├── Invasion_#1.DTA
+    ├── Invasion_#2.DTA
+    ├── Invasion_#3.DTA
+    ├── Invasion_#4.DTA
+    ├── Invasion_#5.DTA
+    ├── Outgas_#1.DTA
+    ├── Outgas_#2.DTA
+    ├── Outgas_#3.DTA
+    ├── Outgas_#4.DTA
+    └── Outgas_#5.DTA
+</pre></div>
+</div>
+<p>Make sure sub-folder name and file names are identical to the names in the example.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<em>string</em>) – folder path</p></li>
+<li><p><strong>cycle_number</strong> (<em>int</em>) – number of full electrochemical cycles performed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p><strong>dataset</strong>: a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.</p>
+<p>dataset -&gt; pandas.DataFrame: a dataset contains the following attributes</p>
+<p>dataset[‘Time’] -&gt; datetime.datetime: datetime of the current datum point</p>
+<p>dataset[‘Voltage’] -&gt; float: voltage data</p>
+<p>dataset[‘Current’] -&gt; float: current data</p>
+<p>dataset[‘pH’] -&gt; float: pH data</p>
+<p>dataset[‘fitted_pH’] -&gt; float: fitted pH data. Fluctuations were removed.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="gas_methods.html" class="btn btn-neutral float-right" title="gas_methods module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="calc_dic.html" class="btn btn-neutral float-left" title="calc_dic module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Martin Jin.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

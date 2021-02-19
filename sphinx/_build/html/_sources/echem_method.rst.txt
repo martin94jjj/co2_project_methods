@@ -1,0 +1,7 @@
+echem\_method module
+====================
+
+.. automodule:: echem_method
+   :members:
+   :undoc-members:
+   :show-inheritance:

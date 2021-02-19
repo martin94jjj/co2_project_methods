@@ -9,18 +9,30 @@ import glob
 import pickle
 from scipy.signal import lfilter,savgol_filter
 
-
 def find_gas_change_time(gas_df,gas_switch_period = 7200,time_attribute='Datetime'):
-    #
-    #    Reads a dataset that has a time_attribute. This dataset should contain CO2 concentration change info
-    #    Returns a dataset that contains the time that each gas switch is made.
-    #Input:
-    #      gas_df -> pandas DataFrame: the dataframe that contains gas information
-    #      gas_switch_period -> int: period of gas change
-    #      time_attribute -> gas_df's attribute that contains datetime information
+    """    
+            Reads a dataset that has a **time_attribute**. This dataset, usually created by `pd.read_csv()` or 
+            `utils.merge_echem_gas_df()`, should contain CO2 concentration change info. 
+            Returns a dataset that contains the time that each gas switch is made.
 
-    #Output:
-    #      time_df: a dataframe that contains cycle number and the time for gas concentration change.
+        :type gas_df: pd.DataFrame
+        :param gas_df: the dataframe that contains gas data, i.e. pCO2, flowrate, MFC input, etc.
+
+        :type gas_switch_peiord: int
+        :param gas_switch_period: Time in seconds indicating the period of gas change.
+
+        :type time_attribute: string
+        :param time_attribute: **gas_df**'s attribute that contains datetime information, usually 'Datetime' or 'Time'.
+
+        :rtype: *pd.DataFrame*
+        :return:
+              **time_df**: a dataframe that contains cycle number and the time for gas concentration change.
+
+              time_df['Cycle'] -> (*int*): number of cycles\n
+              time_df['low_to_high'] -> (*datetime.datetime*): The date and time that pCO2 is changed from low value to high value, e.g. from 0.1 bar to 1 bar\n
+              time_df['high_to_low'] -> (*datetime.datetime*): The date and time that pCO2 is changed from high value to low value, e.g. from 1 bar to 0.1 bar\n
+
+    """
     i = 1
     cycle_number = 1
     low_co2 = True
@@ -48,24 +60,35 @@ def find_gas_change_time(gas_df,gas_switch_period = 7200,time_attribute='Datetim
 
 
 def create_baseline(gas_df,start,end,parameter = 'CO2_Flow',baseline_range = 100):
-    #
-    #
-    #Reads a dataset created by **read_flow_co2**, 
-    #and a start time and an end time from a process(capture process = deacidification + capture ;
-    #release process = acidification + outgas) from **find_echem_time_period**. 
-    #This method linearly fits the 20 points before the process start time and 20 points from process end time. 
-    #Returns the linear fit parameters, the dataset index of the process start time and the dataset index of 
-    #the process end time.
-    # 
-    #Input:
-    #      gas_df -> pandas DataFrame: the dataframe that contains gas information
-    #      start -> datetime: start time of capture or release
-    #      end -> datetime: end time of capture or release
-    #      parameter -> String: the dataset attribute used for baseline fitting
-    #      baseline_range -> int: number of points used for baseline
-    #Output:
-    #      parameters: y=a1x+a2, returns (a1,a2)
-    #
+    ''' 
+    
+    Reads a dataset created by `pd.read_csv()` on gas data or created by `utils.merge_echem_gas_df()`, 
+    and a start time and an end time from a process(capture process = deacidification + capture ;
+    release process = acidification + outgas) from `find_echem_time_period`. 
+    This method linearly fits the **baseline_range** points before the process start time and **baseline_range** points from process end time. 
+    Returns the linear fit parameters, the dataset index of the process start time and the dataset index of 
+    the process end time.
+     
+    :type gas_df: pd.DataFrame
+    :param gas_df: The dataframe that contains gas information, usually created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`
+
+    :type start: datetime.datetime
+    :param start: The start time of CO2 capture or release process
+
+    :type end: datetime.datetime
+    :param end: The end time of CO2 capture or release process
+
+    :type parameter: string
+    :param parameter: The dataset attribute used for baseline fitting, usually 'Corrected_Flow_Right'
+
+    :type baseline_range: int
+    :param baseline_range: number of points used for baseline fitting, usually 500-3000, depending on the length of capture/release period
+
+
+    :rtype: *tuple*
+    :return:
+          **(fit, a1,a2)** : A tuple containing fit, created by `np.polyfit(x,y,1)`, and parameter a1 and a2 of y=a1x+a2, on indices 0,1,2 respectively.
+    '''
     point1 = gas_df[gas_df['Datetime']==start]
     point2 = gas_df[gas_df['Datetime']==end]
     index_1 = point1.index.values[0]
@@ -87,40 +110,53 @@ def create_baseline(gas_df,start,end,parameter = 'CO2_Flow',baseline_range = 100
 
 
 def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter = 'Corrected_Flow_Right',outgas_parameter = 'Corrected_Flow_Right',baseline = 'Adaptive',cycle = 5, shift_periods = 0,baseline_range = 100):
-    #
-    #Reads a gas info dataset created by **read_flow_co2**, and a time period dataset by **find_echem_time_period**.
-    #Calculates the amount of CO2 captured and released. Returns a dataset containing the cycle number, 
-    #captured amount, outgas amount, average amount, fitting parameters for capture and outgas, 
-    #and indices associated with the start and end of the capture/outgas processes.
-    #
-    #
-    #Input:
-    #      gas_df -> pandas DataFrame: dataset (created by **read_co2_flow**) that contains gas information
-    #      echem_time_df -> pandas DataFrame: dataset (created by **find_echem_time_period**) that has process start and end
-    #                time information
-    #      gas_change_time_df -> pandas DataFrame: dataset (created by **find_gas_change_time**) that has 
-    #                the time of gas composition change
-    #      capture_parameter -> String: the dataset attribute used for capture baseline fitting
-    #      outgas_parameter -> String: the dataset attribute used for outgas baseline fitting
-    #      baseline -> String or float: enter a baseline value for CO2 flow or use the default adaptive baseline
-    #
-    #Output:
-    #      dataset -> pandas.DataFrame: a dataset that contains the following attributes
-    #
-    #      dataset[Cycle_Number] -> int:cycle_number,
-    #      dataset[Capture_Amount] -> float : captured amount in this cycle,
-    #      dataset[Outgas_Amount] -> float : released amount in this cycle,
-    #      dataset[Average_Amount] -> float: average captured/released amount in this cycle,
-    #      dataset[c0] -> float: slope of the capture baseline,
-    #      dataset[c1] -> float: intercept of the capture baseline,
-    #      dataset[o0] -> float: slope the outgas baseline,
-    #      dataset[o1] -> float: intercept of the outgas baseline
-    #      dataset[c_start] -> int: index of the start of capture process
-    #      dataset[c_end] -> int: index of the end of capture process
-    #      dataset[o_start] -> int: index of the start of the release process
-    #      dataset[o_end]  -> int: index of the end of the release process
-    #
-    #
+    ''' 
+    Reads a gas info dataset created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`, and a time period dataset by `find_echem_time_period`.
+    Calculates the amount of CO2 captured and released. Returns a dataset containing the cycle number, 
+    captured amount, outgas amount, average amount, fitting parameters for capture and outgas, 
+    and indices associated with the start and end of the capture/outgas processes.
+    
+    
+    :type gas_df: pd.DataFrame
+    :param gas_df: dataset (created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`) that contains gas information
+
+    :type echem_time_df: pd.DataFrame
+    :param echem_time_df: dataset (created by `echem_method.find_echem_time_period`) that has process start and end
+                    time information
+    
+    :type gas_change_time_df: pd.DataFrame
+    :param gas_change_time_df: dataset (created by gas_methods.find_gas_change_time**) that has 
+                    the time of gas composition change
+
+    :type capture_parameter: string
+    :param capture_parameter: The dataset attribute used for capture baseline fitting, usually "Corrected_Flow_Right"
+
+    :type outgas_parameter: string
+    :param outgas_parameter: (*To be done*) the dataset attribute used for outgas baseline fitting
+
+    :type baseline: string or float
+    :param baseline: enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline
+
+    
+    :rtype: *pd.DataFrame*
+    :return: 
+          **dataset**: a dataset that contains the following attributes
+    
+          dataset[Cycle_Number] -> (*int*):cycle_number\n
+          dataset[Capture_Amount] -> (*float*): captured amount in this cycle\n
+          dataset[Outgas_Amount] -> (*float*): released amount in this cycle\n
+          dataset[Average_Amount] -> (*float*): average captured/released amount in this cycle\n
+          dataset[c0] -> (*float*): slope of the capture baseline\n
+          dataset[c1] -> (*float*): intercept of the capture baseline\n
+          dataset[o0] -> (*float*): slope the outgas baseline\n
+          dataset[o1] -> (*float*): intercept of the outgas baseline\n
+          dataset[c_start] -> (*int*): index of the start of capture process\n
+          dataset[c_end] -> (*int*): index of the end of capture process\n
+          dataset[o_start] -> (*int*): index of the start of the release process\n
+          dataset[o_end]  -> (*int*): index of the end of the release process\n
+    
+    '''
+
     capture_amount_array = []
     outgas_amount_array = []
     cycle_number = []
@@ -132,7 +168,7 @@ def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter =
     o1_array = []
     o_start_array = []
     o_end_array = []
-    index = 0;
+    index = 0
 
         
     for i in range(cycle):

@@ -1,0 +1,731 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>echem_methods &mdash; co2_project_methods 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> co2_project_methods
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">co2_project_methods</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">co2_project_methods</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>echem_methods</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for echem_methods</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MultipleLocator</span>
+<span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">fft</span><span class="p">,</span><span class="n">ifft</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">lfilter</span><span class="p">,</span><span class="n">savgol_filter</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fsolve</span><span class="p">,</span><span class="n">root_scalar</span><span class="p">,</span><span class="n">ridder</span><span class="p">,</span><span class="n">anderson</span><span class="p">,</span><span class="n">newton_krylov</span>
+
+
+
+<div class="viewcode-block" id="find_date_time"><a class="viewcode-back" href="../echem_methods.html#echem_methods.find_date_time">[docs]</a><span class="k">def</span> <span class="nf">find_date_time</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    
+    <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    Reads a Gamry file, finds its creation datetime, and returns a datetime variable.</span>
+<span class="sd">    </span>
+<span class="sd">    :type file: string</span>
+<span class="sd">    :param file: the address of the file</span>
+<span class="sd">    </span>
+<span class="sd">    :rtype: *datetime.datetime*</span>
+<span class="sd">    :return: **starting_date_time**: the datetime that the Gamry file was created(when this electrochemical method starts). </span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;DATE&#39;</span><span class="p">):</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;TIME&#39;</span><span class="p">):</span>
+            <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+        
+    <span class="n">starting_date_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">month</span><span class="p">,</span><span class="n">day</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minute</span><span class="p">,</span><span class="n">second</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">starting_date_time</span></div>
+
+<div class="viewcode-block" id="analyze_gamry_file"><a class="viewcode-back" href="../echem_methods.html#echem_methods.analyze_gamry_file">[docs]</a><span class="k">def</span> <span class="nf">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">starting_date_time</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;    </span>
+<span class="sd">    Reads a Gamry file and the starting time of the first file (e.g. the time of the creation or the last time point of previous half cycle). Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.</span>
+
+<span class="sd">    :type file: string</span>
+<span class="sd">    :param file: the address of the file</span>
+
+<span class="sd">    :type starting_date_time: datetime.datetime</span>
+<span class="sd">    :param starting_date_time: the initial datetime of the process</span>
+<span class="sd">   </span>
+<span class="sd">    </span>
+<span class="sd">    :rtype: *pd.DataFrame*</span>
+<span class="sd">    :return: **dataset** a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.</span>
+<span class="sd">            dataset -&gt; pandas.DataFrame: a dataset contains the following attributes\n</span>
+<span class="sd">            dataset[&#39;Delta_T_s&#39;] -&gt; float: time in seconds since the start of the process\n</span>
+<span class="sd">            dataset[&#39;Time&#39;] -&gt; datetime.datetime: datetime of the current datum point\n</span>
+<span class="sd">            dataset[&#39;Voltage&#39;] -&gt; float: voltage data\n</span>
+<span class="sd">            dataset[&#39;Current&#39;] -&gt; float: current data\n</span>
+<span class="sd">            dataset[&#39;pH&#39;] -&gt; float: pH data\n</span>
+<span class="sd">            dataset[&#39;fitted_pH&#39;] -&gt; float: fitted pH data. Fluctuations were removed.\n</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">indicator</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#for indicating row # is not correct yet</span>
+    <span class="n">t_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pH_array_left</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fitted_pH_array_left</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pH_array_right</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fitted_pH_array_right</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">voltage_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">total_time_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+        <span class="c1">#finds the first row where actual data is recorded</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;	0&#39;</span><span class="p">):</span>
+            <span class="n">indicator</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># row.split()[0]! is to avoid the last row of string</span>
+        <span class="k">if</span> <span class="n">indicator</span> <span class="ow">and</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;STARTTIMEOFFSET&#39;</span><span class="p">:</span>
+
+            <span class="c1">#voltage array</span>
+            <span class="n">voltage_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]))</span>
+
+            <span class="c1">#time array(for the purpose of calculating capacity)</span>
+            <span class="n">time_delta_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">t_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time_delta_s</span><span class="p">)</span>
+            <span class="n">total_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">starting_date_time</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time_delta_s</span><span class="p">))</span>
+
+            <span class="c1">#pH arrays</span>
+            <span class="n">pH_array_left</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">11</span><span class="p">])</span><span class="o">*-</span><span class="mf">17.602</span><span class="p">)</span><span class="o">+</span><span class="mf">7.1728</span><span class="p">)</span>       
+            <span class="n">pH_array_right</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">17</span><span class="p">])</span><span class="o">*-</span><span class="mf">17.4</span><span class="p">)</span><span class="o">+</span><span class="mf">7.7278</span><span class="p">)</span>       
+
+            <span class="c1">#current array</span>
+            <span class="n">current_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">]))</span>
+            
+    <span class="c1">#remove unnecessary glitches on the pH data through fitting</span>
+    <span class="n">pH_fit_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">t_array</span><span class="p">,</span><span class="n">pH_array_left</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">total_pH_fit_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">pH_fit_left</span><span class="p">)</span>
+    <span class="n">fitted_pH_array_left</span> <span class="o">=</span> <span class="n">total_pH_fit_left</span><span class="p">(</span><span class="n">t_array</span><span class="p">)</span>
+
+    <span class="n">pH_fit_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">t_array</span><span class="p">,</span><span class="n">pH_array_right</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">total_pH_fit_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">pH_fit_right</span><span class="p">)</span>
+    <span class="n">fitted_pH_array_right</span> <span class="o">=</span> <span class="n">total_pH_fit_right</span><span class="p">(</span><span class="n">t_array</span><span class="p">)</span>
+    
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Delta_T_s&#39;</span><span class="p">:</span><span class="n">t_array</span><span class="p">,</span><span class="s1">&#39;Time&#39;</span><span class="p">:</span><span class="n">total_time_array</span><span class="p">,</span><span class="s1">&#39;Voltage&#39;</span><span class="p">:</span><span class="n">voltage_array</span><span class="p">,</span>
+                        <span class="s1">&#39;Current&#39;</span><span class="p">:</span><span class="n">current_array</span><span class="p">,</span><span class="s1">&#39;pH_left&#39;</span><span class="p">:</span><span class="n">pH_array_left</span><span class="p">,</span><span class="s1">&#39;pH_right&#39;</span><span class="p">:</span><span class="n">pH_array_right</span>
+                        <span class="p">,</span><span class="s1">&#39;fitted_pH_left&#39;</span><span class="p">:</span><span class="n">fitted_pH_array_left</span><span class="p">,</span><span class="s1">&#39;fitted_pH_right&#39;</span><span class="p">:</span><span class="n">fitted_pH_array_right</span><span class="p">})</span>
+    
+    
+    <span class="k">return</span> <span class="n">dataset</span></div>
+
+
+<div class="viewcode-block" id="read_echem"><a class="viewcode-back" href="../echem_methods.html#echem_methods.read_echem">[docs]</a><span class="k">def</span> <span class="nf">read_echem</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;    </span>
+<span class="sd">    Reads a Gamry file folder, utilizes **analyze_gamry_file** to get half-cycle data and puts everything together</span>
+<span class="sd">    in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning:: </span>
+<span class="sd">        The folder structure must be like the following:</span>
+
+<span class="sd">        .. code-block:: </span>
+
+<span class="sd">            path-to-folder</span>
+<span class="sd">            ├── CHARGE_DISCHARGE</span>
+<span class="sd">            │   ├── PWRCHARGE_#1.DTA</span>
+<span class="sd">            │   ├── PWRCHARGE_#2.DTA</span>
+<span class="sd">            │   ├── PWRCHARGE_#3.DTA</span>
+<span class="sd">            │   ├── PWRCHARGE_#4.DTA</span>
+<span class="sd">            │   ├── PWRCHARGE_#5.DTA</span>
+<span class="sd">            │   ├── PWRDISCHARGE_#1.DTA</span>
+<span class="sd">            │   ├── PWRDISCHARGE_#2.DTA</span>
+<span class="sd">            │   ├── PWRDISCHARGE_#3.DTA</span>
+<span class="sd">            │   ├── PWRDISCHARGE_#4.DTA</span>
+<span class="sd">            │   └── PWRDISCHARGE_#5.DTA</span>
+<span class="sd">            └── OTHER</span>
+<span class="sd">                ├── Invasion_#1.DTA</span>
+<span class="sd">                ├── Invasion_#2.DTA</span>
+<span class="sd">                ├── Invasion_#3.DTA</span>
+<span class="sd">                ├── Invasion_#4.DTA</span>
+<span class="sd">                ├── Invasion_#5.DTA</span>
+<span class="sd">                ├── Outgas_#1.DTA</span>
+<span class="sd">                ├── Outgas_#2.DTA</span>
+<span class="sd">                ├── Outgas_#3.DTA</span>
+<span class="sd">                ├── Outgas_#4.DTA</span>
+<span class="sd">                └── Outgas_#5.DTA</span>
+
+<span class="sd">        Make sure sub-folder name and file names are identical to the names in the example.</span>
+<span class="sd">        </span>
+<span class="sd">    :type file: string</span>
+<span class="sd">    :param file: folder path</span>
+
+<span class="sd">    :type cycle_number: int</span>
+<span class="sd">    :param cycle_number: number of full electrochemical cycles performed.</span>
+<span class="sd">    </span>
+<span class="sd">    :rtype: *pd.DataFrame*</span>
+<span class="sd">    :return: **dataset**: a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.</span>
+
+<span class="sd">            dataset -&gt; pandas.DataFrame: a dataset contains the following attributes\n</span>
+<span class="sd">            dataset[&#39;Time&#39;] -&gt; datetime.datetime: datetime of the current datum point\n</span>
+<span class="sd">            dataset[&#39;Voltage&#39;] -&gt; float: voltage data\n</span>
+<span class="sd">            dataset[&#39;Current&#39;] -&gt; float: current data\n</span>
+<span class="sd">            dataset[&#39;pH&#39;] -&gt; float: pH data\n</span>
+<span class="sd">            dataset[&#39;fitted_pH&#39;] -&gt; float: fitted pH data. Fluctuations were removed.\n</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1">#Import deacidification/acidification data</span>
+    <span class="n">srcdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">+</span><span class="s1">&#39;CHARGE_DISCHARGE/&#39;</span>
+    <span class="n">echem_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;*.DTA&#39;</span><span class="p">)</span>
+
+    <span class="c1">#Import voltage-hold period (invasion and outgas) data</span>
+    <span class="n">voltage_hold_srcdir</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span><span class="s1">&#39;OTHER/&#39;</span>
+    <span class="n">voltage_hold_files</span> <span class="o">=</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span><span class="o">+</span><span class="s1">&#39;*.DTA&#39;</span><span class="p">)</span>
+    
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="s1">&#39;Voltage&#39;</span><span class="p">,</span><span class="s1">&#39;Current&#39;</span><span class="p">,</span><span class="s1">&#39;pH_left&#39;</span><span class="p">,</span><span class="s1">&#39;pH_right&#39;</span>
+                                      <span class="p">,</span><span class="s1">&#39;fitted_pH_left&#39;</span><span class="p">,</span><span class="s1">&#39;fitted_pH_right&#39;</span><span class="p">])</span>
+
+    <span class="c1">###initialize the starting time using the first charging file###</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#1.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">initial_file</span><span class="p">:</span>
+        <span class="n">starting_date_time</span> <span class="o">=</span> <span class="n">find_date_time</span><span class="p">(</span><span class="n">initial_file</span><span class="p">)</span>
+        
+    <span class="c1">###import electrochemistry data###</span>
+    
+    <span class="c1"># The value of i is the same as cycle_number -1</span>
+    <span class="c1"># The idea here is: </span>
+    <span class="c1"># 1.Locate a particular cycle number i+1</span>
+    <span class="c1"># 2.Append i+1 cycle&#39;s Charge Data</span>
+    <span class="c1"># 3.Append i+1 cycle&#39;s CO2 infusing data</span>
+    <span class="c1"># 4.Append i+1 cycle&#39;s Discharge Data</span>
+    <span class="c1"># 5.Append i+1 cycle&#39;s CO2 outgasing data</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cycle_number</span><span class="p">):</span>
+        
+        <span class="c1">##Deacidification (Charge)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">starting_date_time</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">dataset</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+        
+        
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">co2</span><span class="p">:</span>
+            <span class="c1">#invasion data</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span><span class="o">+</span><span class="s1">&#39;Invasion_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">dataset</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1">##Discharge data</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRDISCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">dataset</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+        
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        
+        
+        <span class="c1">##Outgass data</span>
+        <span class="k">if</span> <span class="n">co2</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span><span class="o">+</span><span class="s1">&#39;Outgas_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">dataset</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+                <span class="c1">#df[&#39;pH&#39;] = df[&#39;pH&#39;] - 0.1 </span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+            
+        <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">dataset</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">days</span><span class="o">*</span><span class="mi">24</span><span class="o">+</span><span class="n">x</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mi">3600</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="cal_capacity_energy"><a class="viewcode-back" href="../echem_methods.html#echem_methods.cal_capacity_energy">[docs]</a><span class="k">def</span> <span class="nf">cal_capacity_energy</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">cycle_number</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;    </span>
+<span class="sd">    Reads a Gamry file folder, utilizes **analyze_gamry_file** to get half-cycle data and </span>
+<span class="sd">    puts everything together in a dataset with multi-cycle&#39;s cycle capacity,energy and efficiencies.</span>
+<span class="sd">    </span>
+
+<span class="sd">        .. warning:: </span>
+<span class="sd">            The folder structure must be like the following:</span>
+
+<span class="sd">            .. code-block:: </span>
+
+<span class="sd">                path-to-folder</span>
+<span class="sd">                ├── CHARGE_DISCHARGE</span>
+<span class="sd">                │   ├── PWRCHARGE_#1.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#2.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#3.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#4.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#5.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#1.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#2.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#3.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#4.DTA</span>
+<span class="sd">                │   └── PWRDISCHARGE_#5.DTA</span>
+<span class="sd">                └── OTHER</span>
+<span class="sd">                    ├── Invasion_#1.DTA</span>
+<span class="sd">                    ├── Invasion_#2.DTA</span>
+<span class="sd">                    ├── Invasion_#3.DTA</span>
+<span class="sd">                    ├── Invasion_#4.DTA</span>
+<span class="sd">                    ├── Invasion_#5.DTA</span>
+<span class="sd">                    ├── Outgas_#1.DTA</span>
+<span class="sd">                    ├── Outgas_#2.DTA</span>
+<span class="sd">                    ├── Outgas_#3.DTA</span>
+<span class="sd">                    ├── Outgas_#4.DTA</span>
+<span class="sd">                    └── Outgas_#5.DTA</span>
+
+<span class="sd">            Make sure sub-folder name and file names are identical to the names in the example.</span>
+<span class="sd">        </span>
+
+<span class="sd">    :type file: string</span>
+<span class="sd">    :param file: file path and name</span>
+
+<span class="sd">    :type cycle_number: int</span>
+<span class="sd">    :param cycle_number: number of full electrochemical cycles performed.</span>
+
+<span class="sd">    :rtype: *pd.DataFrame*</span>
+<span class="sd">    :return: **dataset** a dataset that containts multi-cycle&#39;s cycle capacity,energy and efficiencies.</span>
+
+<span class="sd">            dataset[&#39;Cycle&#39;] -&gt; datetime.datetime: datetime of the current datum point\n</span>
+<span class="sd">            dataset[&#39;Charge_Capacity&#39;] -&gt; float: charge capacity\n</span>
+<span class="sd">            dataset[&#39;Charge_Energy&#39;] -&gt; float: charge energy\n</span>
+<span class="sd">            dataset[&#39;Discharge_Capacity&#39;] -&gt; float: discharge capacity\n</span>
+<span class="sd">            dataset[&#39;Discharge_Energy&#39;] -&gt; float: discharge energy\n</span>
+<span class="sd">            dataset[&#39;Coulombic_Efficiency&#39;] -&gt; float: coulombic energy\n</span>
+<span class="sd">            dataset[&#39;Energy_Efficiency&#39;] -&gt; float: round-trip energy efficiency\n</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="c1">#Import deacidification/acidification data</span>
+    <span class="n">srcdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">+</span><span class="s1">&#39;CHARGE_DISCHARGE/&#39;</span>
+    <span class="n">echem_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;*.DTA&#39;</span><span class="p">)</span>
+
+    <span class="c1">#Import voltage-hold period (invasion and outgas) data</span>
+    <span class="n">voltage_hold_srcdir</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span><span class="s1">&#39;OTHER/&#39;</span>
+    <span class="n">voltage_hold_files</span> <span class="o">=</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span><span class="o">+</span><span class="s1">&#39;*.DTA&#39;</span><span class="p">)</span>
+    
+    <span class="n">cycle_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">charge_cap_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">charge_energy_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">discharge_cap_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">discharge_energy_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">coulombic_efficiency_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">energy_efficiency_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1">#dataset = pd.DataFrame([0,0,0,0,0,0],columns = [&#39;Cycle&#39;,&#39;Charge Capacity&#39;,&#39;Charge Energy&#39;,</span>
+    <span class="c1">#                                   &#39;Discharge Capacity&#39;,&#39;Discharge Energy&#39;,&#39;Coulombic Efficiency&#39;])</span>
+    
+    <span class="c1">###initialize the starting time using the first charging file###</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#1.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">initial_file</span><span class="p">:</span>
+        <span class="n">starting_date_time</span> <span class="o">=</span> <span class="n">find_date_time</span><span class="p">(</span><span class="n">initial_file</span><span class="p">)</span>
+        
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cycle_number</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            
+            <span class="n">charge_df</span> <span class="o">=</span> <span class="n">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">starting_date_time</span><span class="p">)</span>
+
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRDISCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            
+            <span class="n">discharge_df</span> <span class="o">=</span> <span class="n">analyze_gamry_file</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">starting_date_time</span><span class="p">)</span>
+        
+        <span class="n">cycle_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">charge_cap_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">charge_df</span><span class="p">[</span><span class="s1">&#39;Current&#39;</span><span class="p">]))</span>
+        <span class="n">charge_energy_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">charge_df</span><span class="p">[</span><span class="s1">&#39;Current&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">charge_df</span><span class="p">[</span><span class="s1">&#39;Voltage&#39;</span><span class="p">]))</span>
+        <span class="n">discharge_cap_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">discharge_df</span><span class="p">[</span><span class="s1">&#39;Current&#39;</span><span class="p">]))</span>
+        <span class="n">discharge_energy_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">discharge_df</span><span class="p">[</span><span class="s1">&#39;Current&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">discharge_df</span><span class="p">[</span><span class="s1">&#39;Voltage&#39;</span><span class="p">]))</span>
+        <span class="n">coulombic_efficiency_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">discharge_cap_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">charge_cap_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">energy_efficiency_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">discharge_energy_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">charge_energy_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Cycle_Number&#39;</span><span class="p">:</span><span class="n">cycle_array</span><span class="p">,</span><span class="s1">&#39;Charge_Capacity&#39;</span><span class="p">:</span><span class="n">charge_cap_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Charge_Energy&#39;</span><span class="p">:</span><span class="n">charge_energy_array</span><span class="p">,</span><span class="s1">&#39;Discharge_Capacity&#39;</span><span class="p">:</span><span class="n">discharge_cap_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Discharge_Energy&#39;</span><span class="p">:</span><span class="n">discharge_energy_array</span>
+                            <span class="p">,</span><span class="s1">&#39;Coulombic_Efficiency&#39;</span><span class="p">:</span><span class="n">coulombic_efficiency_array</span>
+                            <span class="p">,</span><span class="s1">&#39;Energy_Efficiency&#39;</span><span class="p">:</span><span class="n">energy_efficiency_array</span><span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">dataset</span></div>
+        
+
+<div class="viewcode-block" id="find_echem_time_period"><a class="viewcode-back" href="../echem_methods.html#echem_methods.find_echem_time_period">[docs]</a><span class="k">def</span> <span class="nf">find_echem_time_period</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">outgas_time</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">      Utilizes `find_date_time method`, reads a Gamry folder and returns a dataset containing the start and end time </span>
+<span class="sd">      of deacidification, capture, acidification and outgas.</span>
+<span class="sd">    </span>
+<span class="sd">        .. warning:: </span>
+<span class="sd">            The folder structure must be like the following:</span>
+
+<span class="sd">            .. code-block:: </span>
+
+<span class="sd">                path-to-folder</span>
+<span class="sd">                ├── CHARGE_DISCHARGE</span>
+<span class="sd">                │   ├── PWRCHARGE_#1.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#2.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#3.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#4.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#5.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#1.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#2.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#3.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#4.DTA</span>
+<span class="sd">                │   └── PWRDISCHARGE_#5.DTA</span>
+<span class="sd">                └── OTHER</span>
+<span class="sd">                    ├── Invasion_#1.DTA</span>
+<span class="sd">                    ├── Invasion_#2.DTA</span>
+<span class="sd">                    ├── Invasion_#3.DTA</span>
+<span class="sd">                    ├── Invasion_#4.DTA</span>
+<span class="sd">                    ├── Invasion_#5.DTA</span>
+<span class="sd">                    ├── Outgas_#1.DTA</span>
+<span class="sd">                    ├── Outgas_#2.DTA</span>
+<span class="sd">                    ├── Outgas_#3.DTA</span>
+<span class="sd">                    ├── Outgas_#4.DTA</span>
+<span class="sd">                    └── Outgas_#5.DTA</span>
+
+<span class="sd">            Make sure sub-folder name and file names are identical to the names in the example.</span>
+<span class="sd">        </span>
+<span class="sd">      :type path: string</span>
+<span class="sd">      :param path: the address of the folder that contains the electrochemistry files.</span>
+
+<span class="sd">      :type co2: boolean</span>
+<span class="sd">      :param co2: whether CO2 capture/release took place</span>
+
+<span class="sd">      :type outgas_time: float</span>
+<span class="sd">      :param outgas_time: time in minutes for the outgas period</span>
+
+<span class="sd">      :rtype: *pd.DataFrame*</span>
+<span class="sd">      :return:     a dataset that contains the start and end time of deacidification, capture, acidification and outgas.</span>
+<span class="sd">            dataset -&gt; pandas.DataFrame: a dataset that contains the following attributes\n</span>
+<span class="sd">            dataset[&#39;Cycle&#39;] -&gt; int: cycle number\n</span>
+<span class="sd">            dataset[&#39;Charge_Start_Time&#39;] -&gt; datetime.datetime: \n</span>
+<span class="sd">            dataset[&#39;Capture_Start_Time&#39;] -&gt; datetime.datetime\n</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="c1">#Import electrochemistry data </span>
+    <span class="n">srcdir</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;CHARGE_DISCHARGE/&#39;</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">srcdir</span> <span class="o">+</span> <span class="s1">&#39;*.DTA&#39;</span><span class="p">)</span>
+    <span class="c1">#Import voltage hold data    </span>
+    <span class="n">voltage_hold_srcdir</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;OTHER/&#39;</span>
+    <span class="n">voltage_hold_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span> <span class="o">+</span> <span class="s1">&#39;*.DTA&#39;</span><span class="p">)</span>
+    <span class="c1">#initialize the column needed</span>
+    <span class="n">cycle_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">charge_start_time_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">capture_start_time_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">discharge_start_time_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">outgas_start_time_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">outgas_end_time_array</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">):</span>
+        <span class="n">cycle_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">charge_file</span><span class="p">:</span>
+            <span class="n">charge_start_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">find_date_time</span><span class="p">(</span><span class="n">charge_file</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">co2</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span><span class="o">+</span><span class="s1">&#39;Invasion_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="n">newline</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">capture_file</span><span class="p">:</span>
+                <span class="n">capture_start_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">find_date_time</span><span class="p">(</span><span class="n">capture_file</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRDISCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">discharge_file</span><span class="p">:</span>
+            <span class="n">discharge_start_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">find_date_time</span><span class="p">(</span><span class="n">discharge_file</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">co2</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">discharge_file</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;DATE&#39;</span><span class="p">):</span>
+                        <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+                        <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;TIME&#39;</span><span class="p">):</span>
+                        <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">co2</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span><span class="o">+</span><span class="s1">&#39;Outgas_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="n">newline</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outgas_file</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">outgas_file</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;DATE&#39;</span><span class="p">):</span>
+                        <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+                        <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;TIME&#39;</span><span class="p">):</span>
+                        <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+            
+            <span class="n">outgas_start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">month</span><span class="p">,</span><span class="n">day</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minute</span><span class="p">,</span><span class="n">second</span><span class="p">)</span>
+            <span class="n">outgas_start_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outgas_start_time</span><span class="p">)</span>
+            <span class="n">minute</span> <span class="o">=</span> <span class="n">minute</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">outgas_time</span><span class="o">%</span><span class="mi">60</span><span class="p">)</span>
+            <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">outgas_time</span><span class="o">//</span><span class="mi">60</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">minute</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">:</span>
+                <span class="n">minute</span> <span class="o">=</span> <span class="n">minute</span> <span class="o">-</span> <span class="mi">60</span>
+                <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">hour</span> <span class="o">&gt;=</span> <span class="mi">24</span><span class="p">:</span>
+                    <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span><span class="o">-</span><span class="mi">24</span>
+                    <span class="n">day</span> <span class="o">=</span> <span class="n">day</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">outgas_end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">month</span><span class="p">,</span><span class="n">day</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minute</span><span class="p">,</span><span class="n">second</span><span class="p">)</span>
+            <span class="n">outgas_end_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outgas_end_time</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">co2</span><span class="p">:</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Cycle&#39;</span><span class="p">:</span><span class="n">cycle_array</span><span class="p">,</span><span class="s1">&#39;Charge_Start_Time&#39;</span><span class="p">:</span><span class="n">charge_start_time_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Capture_Start_Time&#39;</span><span class="p">:</span><span class="n">capture_start_time_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Discharge_Start_Time&#39;</span><span class="p">:</span><span class="n">discharge_start_time_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Outgas_Start_Time&#39;</span><span class="p">:</span><span class="n">outgas_start_time_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Outgas_End_Time&#39;</span><span class="p">:</span><span class="n">outgas_end_time_array</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Cycle&#39;</span><span class="p">:</span><span class="n">cycle_array</span><span class="p">,</span><span class="s1">&#39;Charge_Start_Time&#39;</span><span class="p">:</span><span class="n">charge_start_time_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Discharge_Start_Time&#39;</span><span class="p">:</span><span class="n">discharge_start_time_array</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="create_echem_dfs"><a class="viewcode-back" href="../echem_methods.html#echem_methods.create_echem_dfs">[docs]</a><span class="k">def</span> <span class="nf">create_echem_dfs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">outgas_time</span><span class="o">=</span><span class="mi">107</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;    </span>
+<span class="sd">      Combine the results of **read_echem**, **cal_capacity_energy**, </span>
+<span class="sd">      and **find_echem_time_period** to produce a dictionary of the three dfs.</span>
+
+<span class="sd">        .. warning:: </span>
+<span class="sd">            The folder structure must be like the following:</span>
+
+<span class="sd">            .. code-block:: </span>
+
+<span class="sd">                path-to-folder</span>
+<span class="sd">                ├── CHARGE_DISCHARGE</span>
+<span class="sd">                │   ├── PWRCHARGE_#1.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#2.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#3.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#4.DTA</span>
+<span class="sd">                │   ├── PWRCHARGE_#5.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#1.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#2.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#3.DTA</span>
+<span class="sd">                │   ├── PWRDISCHARGE_#4.DTA</span>
+<span class="sd">                │   └── PWRDISCHARGE_#5.DTA</span>
+<span class="sd">                └── OTHER</span>
+<span class="sd">                    ├── Invasion_#1.DTA</span>
+<span class="sd">                    ├── Invasion_#2.DTA</span>
+<span class="sd">                    ├── Invasion_#3.DTA</span>
+<span class="sd">                    ├── Invasion_#4.DTA</span>
+<span class="sd">                    ├── Invasion_#5.DTA</span>
+<span class="sd">                    ├── Outgas_#1.DTA</span>
+<span class="sd">                    ├── Outgas_#2.DTA</span>
+<span class="sd">                    ├── Outgas_#3.DTA</span>
+<span class="sd">                    ├── Outgas_#4.DTA</span>
+<span class="sd">                    └── Outgas_#5.DTA</span>
+
+<span class="sd">            Make sure sub-folder name and file names are identical to the names in the example.</span>
+<span class="sd">        </span>
+<span class="sd">      :type path: string</span>
+<span class="sd">      :param path: the address of the folder that contains the electrochemistry files.</span>
+
+<span class="sd">      :type co2: boolean</span>
+<span class="sd">      :param co2: whether CO2 capture/release took place</span>
+
+<span class="sd">      :type outgas_time: float</span>
+<span class="sd">      :param outgas_time: time in minutes for the outgas period</span>
+
+<span class="sd">      :type cycle_number: int</span>
+<span class="sd">      :param cycle_number: number of cycles</span>
+
+<span class="sd">    </span>
+<span class="sd">      :rtype: *dict*</span>
+<span class="sd">      :return: a dictionary of echem_df,energy_df and time_df</span>
+<span class="sd">    </span>
+<span class="sd">        </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#Process Echem Data</span>
+    <span class="n">electrochem_path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="c1">#create echem df</span>
+    <span class="n">echem_df</span> <span class="o">=</span> <span class="n">read_echem</span><span class="p">(</span><span class="n">electrochem_path</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="n">co2</span><span class="p">,</span><span class="n">cycle_number</span> <span class="o">=</span><span class="n">cycle_number</span><span class="p">)</span>
+
+    <span class="c1">#concatenate all df and create a total echem df</span>
+    <span class="n">echem_df</span><span class="p">[</span><span class="s1">&#39;Hours&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">echem_df</span><span class="o">.</span><span class="n">index</span><span class="o">/</span><span class="mi">3600</span>
+
+    <span class="c1">#create energy df</span>
+    <span class="n">energy_df</span> <span class="o">=</span> <span class="n">cal_capacity_energy</span><span class="p">(</span><span class="n">electrochem_path</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="n">cycle_number</span><span class="p">)</span>
+
+    <span class="c1">#create time df</span>
+    <span class="c1">#107/120 because the voltage hold period is 107 minute, determined by deducting echem time from 2 hour.</span>
+    <span class="n">time_df</span> <span class="o">=</span> <span class="n">find_echem_time_period</span><span class="p">(</span><span class="n">electrochem_path</span><span class="p">,</span><span class="n">outgas_time</span><span class="o">=</span><span class="n">outgas_time</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="n">co2</span><span class="p">)</span>
+    <span class="c1">#display(time_40_df)</span>
+    
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;echem_df&quot;</span><span class="p">:</span><span class="n">echem_df</span><span class="p">,</span><span class="s2">&quot;energy_df&quot;</span><span class="p">:</span><span class="n">energy_df</span><span class="p">,</span><span class="s2">&quot;time_df&quot;</span><span class="p">:</span><span class="n">time_df</span><span class="p">}</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Martin Jin.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

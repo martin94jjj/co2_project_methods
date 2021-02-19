@@ -11,17 +11,20 @@ import pickle
 from scipy.signal import lfilter,savgol_filter
 from scipy.optimize import fsolve,root_scalar,ridder,anderson,newton_krylov
 
+
+
 def find_date_time(file):
     
-    #  Reads a Gamry file, finds its creation datetime, and returns a datetime variable.
-    #
-    #  Input:
-    #        file -> String: the address of the file
-    #
-    #  Output:
-    #        starting_date_time -> datetime.datetime: the datetime that the Gamry file was created(when this 
-    #                                                  electrochemical method starts).
-    #    
+    ''' 
+    Reads a Gamry file, finds its creation datetime, and returns a datetime variable.
+    
+    :type file: string
+    :param file: the address of the file
+    
+    :rtype: *datetime.datetime*
+    :return: **starting_date_time**: the datetime that the Gamry file was created(when this electrochemical method starts). 
+
+    '''
     for row in file:
         if row.startswith('DATE'):
             year = int(row.split()[2].split('/')[2])
@@ -36,26 +39,27 @@ def find_date_time(file):
     return starting_date_time
 
 def analyze_gamry_file(file,starting_date_time):
-    
-    #  Reads a Gamry file and the starting time of the first file 
-    #  (e.g. the time of the creation or the last time point of previous half cycle). 
-    #  Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.
-    #
-    #  Inputs:
-    #        file -> String: file path and name
-    #        starting_date_time -> datetime.datetime: the initial datetime of the process
-    #
-    #  Output:
-    #        dataset -> pandas.DataFrame: a dataset contains the following attributes
-    #         
-    #        dataset['Delta_T_s'] -> float: time in seconds since the start of the process
-    #        dataset['Time'] -> datetime.datetime: datetime of the current datum point
-    #        dataset['Voltage'] -> float: voltage data
-    #        dataset['Current'] -> float: current data
-    #        dataset['pH'] -> float: pH data
-    #        dataset['fitted_pH'] -> float: fitted pH data. Fluctuations were removed.
+    '''    
+    Reads a Gamry file and the starting time of the first file (e.g. the time of the creation or the last time point of previous half cycle). Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.
 
+    :type file: string
+    :param file: the address of the file
+
+    :type starting_date_time: datetime.datetime
+    :param starting_date_time: the initial datetime of the process
+   
     
+    :rtype: *pd.DataFrame*
+    :return: **dataset** a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.
+            dataset -> pandas.DataFrame: a dataset contains the following attributes\n
+            dataset['Delta_T_s'] -> float: time in seconds since the start of the process\n
+            dataset['Time'] -> datetime.datetime: datetime of the current datum point\n
+            dataset['Voltage'] -> float: voltage data\n
+            dataset['Current'] -> float: current data\n
+            dataset['pH'] -> float: pH data\n
+            dataset['fitted_pH'] -> float: fitted pH data. Fluctuations were removed.\n
+
+    '''
     indicator = False #for indicating row # is not correct yet
     t_array = []
     pH_array_left = []
@@ -106,23 +110,57 @@ def analyze_gamry_file(file,starting_date_time):
 
 
 def read_echem(path,cycle_number=5,co2=True):
+    '''    
+    Reads a Gamry file folder, utilizes **analyze_gamry_file** to get half-cycle data and puts everything together
+    in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.
     
-    #  Reads a Gamry file folder, utilizes **analyze_gamry_file** to get half-cycle data and puts everything together
-    #  in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.
-    #
-    #  Inputs:
-    #        file -> String: file path and name
-    #        cycle_number -> int: number of full electrochemical cycles performed.
-    #
-    #  Output:
-    #        dataset -> pandas.DataFrame: a dataset contains the following attributes
-    #         
-    #        dataset['Time'] -> datetime.datetime: datetime of the current datum point
-    #        dataset['Voltage'] -> float: voltage data
-    #        dataset['Current'] -> float: current data
-    #        dataset['pH'] -> float: pH data
-    #        dataset['fitted_pH'] -> float: fitted pH data. Fluctuations were removed.
+    .. warning:: 
+        The folder structure must be like the following:
+
+        .. code-block:: 
+
+            path-to-folder
+            ├── CHARGE_DISCHARGE
+            │   ├── PWRCHARGE_#1.DTA
+            │   ├── PWRCHARGE_#2.DTA
+            │   ├── PWRCHARGE_#3.DTA
+            │   ├── PWRCHARGE_#4.DTA
+            │   ├── PWRCHARGE_#5.DTA
+            │   ├── PWRDISCHARGE_#1.DTA
+            │   ├── PWRDISCHARGE_#2.DTA
+            │   ├── PWRDISCHARGE_#3.DTA
+            │   ├── PWRDISCHARGE_#4.DTA
+            │   └── PWRDISCHARGE_#5.DTA
+            └── OTHER
+                ├── Invasion_#1.DTA
+                ├── Invasion_#2.DTA
+                ├── Invasion_#3.DTA
+                ├── Invasion_#4.DTA
+                ├── Invasion_#5.DTA
+                ├── Outgas_#1.DTA
+                ├── Outgas_#2.DTA
+                ├── Outgas_#3.DTA
+                ├── Outgas_#4.DTA
+                └── Outgas_#5.DTA
+
+        Make sure sub-folder name and file names are identical to the names in the example.
+        
+    :type file: string
+    :param file: folder path
+
+    :type cycle_number: int
+    :param cycle_number: number of full electrochemical cycles performed.
     
+    :rtype: *pd.DataFrame*
+    :return: **dataset**: a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.
+
+            dataset -> pandas.DataFrame: a dataset contains the following attributes\n
+            dataset['Time'] -> datetime.datetime: datetime of the current datum point\n
+            dataset['Voltage'] -> float: voltage data\n
+            dataset['Current'] -> float: current data\n
+            dataset['pH'] -> float: pH data\n
+            dataset['fitted_pH'] -> float: fitted pH data. Fluctuations were removed.\n
+    '''
     
     #Import deacidification/acidification data
     srcdir = path+'CHARGE_DISCHARGE/'
@@ -187,24 +225,60 @@ def read_echem(path,cycle_number=5,co2=True):
     return dataset
 
 def cal_capacity_energy(path,cycle_number = 5):
-    #  Reads a Gamry file folder, utilizes **analyze_gamry_file** to get half-cycle data and 
-    #  puts everything together in a dataset with multi-cycle's cycle capacity,energy and efficiencies.
-    #
-    #  Inputs:
-    #        file -> String: file path and name
-    #        cycle_number -> int: number of full electrochemical cycles performed.
-    #
-    #  Output:
-    #        dataset -> pandas.DataFrame: a dataset contains the following attributes
-    #         
-    #        dataset['Cycle'] -> datetime.datetime: datetime of the current datum point
-    #        dataset['Charge_Capacity'] -> float: charge capacity
-    #        dataset['Charge_Energy'] -> float: charge energy
-    #        dataset['Discharge_Capacity'] -> float: discharge capacity
-    #        dataset['Discharge_Energy'] -> float: discharge energy
-    #        dataset['Coulombic_Efficiency'] -> float: coulombic energy
-    #        dataset['Energy_Efficiency'] -> float: round-trip energy efficiency
-    #
+    """    
+    Reads a Gamry file folder, utilizes **analyze_gamry_file** to get half-cycle data and 
+    puts everything together in a dataset with multi-cycle's cycle capacity,energy and efficiencies.
+    
+
+        .. warning:: 
+            The folder structure must be like the following:
+
+            .. code-block:: 
+
+                path-to-folder
+                ├── CHARGE_DISCHARGE
+                │   ├── PWRCHARGE_#1.DTA
+                │   ├── PWRCHARGE_#2.DTA
+                │   ├── PWRCHARGE_#3.DTA
+                │   ├── PWRCHARGE_#4.DTA
+                │   ├── PWRCHARGE_#5.DTA
+                │   ├── PWRDISCHARGE_#1.DTA
+                │   ├── PWRDISCHARGE_#2.DTA
+                │   ├── PWRDISCHARGE_#3.DTA
+                │   ├── PWRDISCHARGE_#4.DTA
+                │   └── PWRDISCHARGE_#5.DTA
+                └── OTHER
+                    ├── Invasion_#1.DTA
+                    ├── Invasion_#2.DTA
+                    ├── Invasion_#3.DTA
+                    ├── Invasion_#4.DTA
+                    ├── Invasion_#5.DTA
+                    ├── Outgas_#1.DTA
+                    ├── Outgas_#2.DTA
+                    ├── Outgas_#3.DTA
+                    ├── Outgas_#4.DTA
+                    └── Outgas_#5.DTA
+
+            Make sure sub-folder name and file names are identical to the names in the example.
+        
+
+    :type file: string
+    :param file: file path and name
+
+    :type cycle_number: int
+    :param cycle_number: number of full electrochemical cycles performed.
+
+    :rtype: *pd.DataFrame*
+    :return: **dataset** a dataset that containts multi-cycle's cycle capacity,energy and efficiencies.
+
+            dataset['Cycle'] -> datetime.datetime: datetime of the current datum point\n
+            dataset['Charge_Capacity'] -> float: charge capacity\n
+            dataset['Charge_Energy'] -> float: charge energy\n
+            dataset['Discharge_Capacity'] -> float: discharge capacity\n
+            dataset['Discharge_Energy'] -> float: discharge energy\n
+            dataset['Coulombic_Efficiency'] -> float: coulombic energy\n
+            dataset['Energy_Efficiency'] -> float: round-trip energy efficiency\n
+    """
     
     
     #Import deacidification/acidification data
@@ -257,26 +331,60 @@ def cal_capacity_energy(path,cycle_number = 5):
 
 def find_echem_time_period(path,co2=True,outgas_time = 60):
     
-    #
-    #  Utilizes find_date_time method, reads a Gamry folder and returns a dataset containing the start and end time 
-    #  of deacidification, capture, acidification and outgas.
-    #
-    #  Input:
-    #        path -> String: the address of the folder that contains the electrochemistry files.
-    #        co2 -> Boolean: whether CO2 capture/release took place
-    #        outgas_time -> float: time in minutes for the outgas period
-    #
-    #  Output:
-    #        dataset -> pandas.DataFrame: a dataset that contains the following attributes
-    #
-    # 
-    #        dataset['Cycle'] -> int: cycle number
-    #        dataset['Charge_Start_Time'] -> datetime.datetime: 
-    #        dataset['Capture_Start_Time'] -> datetime.datetime
-    #
-    #
-    #
-    #
+    """ 
+      Utilizes `find_date_time method`, reads a Gamry folder and returns a dataset containing the start and end time 
+      of deacidification, capture, acidification and outgas.
+    
+        .. warning:: 
+            The folder structure must be like the following:
+
+            .. code-block:: 
+
+                path-to-folder
+                ├── CHARGE_DISCHARGE
+                │   ├── PWRCHARGE_#1.DTA
+                │   ├── PWRCHARGE_#2.DTA
+                │   ├── PWRCHARGE_#3.DTA
+                │   ├── PWRCHARGE_#4.DTA
+                │   ├── PWRCHARGE_#5.DTA
+                │   ├── PWRDISCHARGE_#1.DTA
+                │   ├── PWRDISCHARGE_#2.DTA
+                │   ├── PWRDISCHARGE_#3.DTA
+                │   ├── PWRDISCHARGE_#4.DTA
+                │   └── PWRDISCHARGE_#5.DTA
+                └── OTHER
+                    ├── Invasion_#1.DTA
+                    ├── Invasion_#2.DTA
+                    ├── Invasion_#3.DTA
+                    ├── Invasion_#4.DTA
+                    ├── Invasion_#5.DTA
+                    ├── Outgas_#1.DTA
+                    ├── Outgas_#2.DTA
+                    ├── Outgas_#3.DTA
+                    ├── Outgas_#4.DTA
+                    └── Outgas_#5.DTA
+
+            Make sure sub-folder name and file names are identical to the names in the example.
+        
+      :type path: string
+      :param path: the address of the folder that contains the electrochemistry files.
+
+      :type co2: boolean
+      :param co2: whether CO2 capture/release took place
+
+      :type outgas_time: float
+      :param outgas_time: time in minutes for the outgas period
+
+      :rtype: *pd.DataFrame*
+      :return:     a dataset that contains the start and end time of deacidification, capture, acidification and outgas.
+            dataset -> pandas.DataFrame: a dataset that contains the following attributes\n
+            dataset['Cycle'] -> int: cycle number\n
+            dataset['Charge_Start_Time'] -> datetime.datetime: \n
+            dataset['Capture_Start_Time'] -> datetime.datetime\n
+    
+    
+    
+    """
     
     
     #Import electrochemistry data 
@@ -349,20 +457,60 @@ def find_echem_time_period(path,co2=True,outgas_time = 60):
 
 def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=107):
     
-    #
-    #  Combine the results of **read_echem**, **cal_capacity_energy**, 
-    #  and **find_echem_time_period** to produce a dictionary of the three dfs.
-    #
-    #  Input:
-    #        path -> String: the address of the folder that contains the electrochemistry files.
-    #        co2 -> Boolean: whether CO2 capture/release took place
-    #        outgas_time -> float: time in minutes for the outgas period
-    #        cycle_number -> int: number of cycles
-    #
-    #  Output:
-    #        a dictionary of echem_df,energy_df and time_df
-    #
-    #
+    """    
+      Combine the results of **read_echem**, **cal_capacity_energy**, 
+      and **find_echem_time_period** to produce a dictionary of the three dfs.
+
+        .. warning:: 
+            The folder structure must be like the following:
+
+            .. code-block:: 
+
+                path-to-folder
+                ├── CHARGE_DISCHARGE
+                │   ├── PWRCHARGE_#1.DTA
+                │   ├── PWRCHARGE_#2.DTA
+                │   ├── PWRCHARGE_#3.DTA
+                │   ├── PWRCHARGE_#4.DTA
+                │   ├── PWRCHARGE_#5.DTA
+                │   ├── PWRDISCHARGE_#1.DTA
+                │   ├── PWRDISCHARGE_#2.DTA
+                │   ├── PWRDISCHARGE_#3.DTA
+                │   ├── PWRDISCHARGE_#4.DTA
+                │   └── PWRDISCHARGE_#5.DTA
+                └── OTHER
+                    ├── Invasion_#1.DTA
+                    ├── Invasion_#2.DTA
+                    ├── Invasion_#3.DTA
+                    ├── Invasion_#4.DTA
+                    ├── Invasion_#5.DTA
+                    ├── Outgas_#1.DTA
+                    ├── Outgas_#2.DTA
+                    ├── Outgas_#3.DTA
+                    ├── Outgas_#4.DTA
+                    └── Outgas_#5.DTA
+
+            Make sure sub-folder name and file names are identical to the names in the example.
+        
+      :type path: string
+      :param path: the address of the folder that contains the electrochemistry files.
+
+      :type co2: boolean
+      :param co2: whether CO2 capture/release took place
+
+      :type outgas_time: float
+      :param outgas_time: time in minutes for the outgas period
+
+      :type cycle_number: int
+      :param cycle_number: number of cycles
+
+    
+      :rtype: *dict*
+      :return: a dictionary of echem_df,energy_df and time_df
+    
+        
+
+    """
     
     #Process Echem Data
     electrochem_path = path

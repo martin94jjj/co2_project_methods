@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gas_methods &mdash; co2_project_methods 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> co2_project_methods
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">co2_project_methods</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">co2_project_methods</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>gas_methods</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gas_methods</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">lfilter</span><span class="p">,</span><span class="n">savgol_filter</span>
+
+<div class="viewcode-block" id="find_gas_change_time"><a class="viewcode-back" href="../gas_methods.html#gas_methods.find_gas_change_time">[docs]</a><span class="k">def</span> <span class="nf">find_gas_change_time</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">gas_switch_period</span> <span class="o">=</span> <span class="mi">7200</span><span class="p">,</span><span class="n">time_attribute</span><span class="o">=</span><span class="s1">&#39;Datetime&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;    </span>
+<span class="sd">            Reads a dataset that has a **time_attribute**. This dataset, usually created by `pd.read_csv()` or </span>
+<span class="sd">            `utils.merge_echem_gas_df()`, should contain CO2 concentration change info. </span>
+<span class="sd">            Returns a dataset that contains the time that each gas switch is made.</span>
+
+<span class="sd">        :type gas_df: pd.DataFrame</span>
+<span class="sd">        :param gas_df: the dataframe that contains gas data, i.e. pCO2, flowrate, MFC input, etc.</span>
+
+<span class="sd">        :type gas_switch_peiord: int</span>
+<span class="sd">        :param gas_switch_period: Time in seconds indicating the period of gas change.</span>
+
+<span class="sd">        :type time_attribute: string</span>
+<span class="sd">        :param time_attribute: **gas_df**&#39;s attribute that contains datetime information, usually &#39;Datetime&#39; or &#39;Time&#39;.</span>
+
+<span class="sd">        :rtype: *pd.DataFrame*</span>
+<span class="sd">        :return:</span>
+<span class="sd">              **time_df**: a dataframe that contains cycle number and the time for gas concentration change.</span>
+
+<span class="sd">              time_df[&#39;Cycle&#39;] -&gt; (*int*): number of cycles\n</span>
+<span class="sd">              time_df[&#39;low_to_high&#39;] -&gt; (*datetime.datetime*): The date and time that pCO2 is changed from low value to high value, e.g. from 0.1 bar to 1 bar\n</span>
+<span class="sd">              time_df[&#39;high_to_low&#39;] -&gt; (*datetime.datetime*): The date and time that pCO2 is changed from high value to low value, e.g. from 1 bar to 0.1 bar\n</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">cycle_number</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">low_co2</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">cycle_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">low_to_high_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">high_to_low_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">gas_switch_period</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">gas_df</span><span class="p">)):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">low_co2</span><span class="p">):</span>
+            <span class="n">cycle_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cycle_number</span><span class="p">)</span>
+            <span class="n">low_co2</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">low_to_high_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">gas_switch_period</span><span class="p">][</span><span class="n">time_attribute</span><span class="p">])</span>
+            <span class="n">i</span><span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cycle_number</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">low_co2</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">high_to_low_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">gas_switch_period</span><span class="p">][</span><span class="n">time_attribute</span><span class="p">])</span>
+            <span class="n">i</span><span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">high_to_low_array</span><span class="p">)</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">low_to_high_array</span><span class="p">):</span>
+        <span class="n">high_to_low_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">time_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Cycle&quot;</span><span class="p">:</span><span class="n">cycle_array</span><span class="p">,</span><span class="s2">&quot;low_to_high&quot;</span><span class="p">:</span>
+                            <span class="n">low_to_high_array</span><span class="p">,</span><span class="s2">&quot;high_to_low&quot;</span><span class="p">:</span><span class="n">high_to_low_array</span><span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">time_df</span></div>
+            
+
+
+<div class="viewcode-block" id="create_baseline"><a class="viewcode-back" href="../gas_methods.html#gas_methods.create_baseline">[docs]</a><span class="k">def</span> <span class="nf">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;CO2_Flow&#39;</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    </span>
+<span class="sd">    Reads a dataset created by `pd.read_csv()` on gas data or created by `utils.merge_echem_gas_df()`, </span>
+<span class="sd">    and a start time and an end time from a process(capture process = deacidification + capture ;</span>
+<span class="sd">    release process = acidification + outgas) from `find_echem_time_period`. </span>
+<span class="sd">    This method linearly fits the **baseline_range** points before the process start time and **baseline_range** points from process end time. </span>
+<span class="sd">    Returns the linear fit parameters, the dataset index of the process start time and the dataset index of </span>
+<span class="sd">    the process end time.</span>
+<span class="sd">     </span>
+<span class="sd">    :type gas_df: pd.DataFrame</span>
+<span class="sd">    :param gas_df: The dataframe that contains gas information, usually created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`</span>
+
+<span class="sd">    :type start: datetime.datetime</span>
+<span class="sd">    :param start: The start time of CO2 capture or release process</span>
+
+<span class="sd">    :type end: datetime.datetime</span>
+<span class="sd">    :param end: The end time of CO2 capture or release process</span>
+
+<span class="sd">    :type parameter: string</span>
+<span class="sd">    :param parameter: The dataset attribute used for baseline fitting, usually &#39;Corrected_Flow_Right&#39;</span>
+
+<span class="sd">    :type baseline_range: int</span>
+<span class="sd">    :param baseline_range: number of points used for baseline fitting, usually 500-3000, depending on the length of capture/release period</span>
+
+
+<span class="sd">    :rtype: *tuple*</span>
+<span class="sd">    :return:</span>
+<span class="sd">          **(fit, a1,a2)** : A tuple containing fit, created by `np.polyfit(x,y,1)`, and parameter a1 and a2 of y=a1x+a2, on indices 0,1,2 respectively.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">point1</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">start</span><span class="p">]</span>
+    <span class="n">point2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">end</span><span class="p">]</span>
+    <span class="n">index_1</span> <span class="o">=</span> <span class="n">point1</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">index_2</span> <span class="o">=</span> <span class="n">point2</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_1</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_1</span><span class="p">][</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_2</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_2</span><span class="p">][</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_1</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_1</span><span class="p">][</span><span class="n">parameter</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_2</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_2</span><span class="p">][</span><span class="n">parameter</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="c1">#solve a1x+a2 = y</span>
+        
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">))</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">))</span>
+    
+    <span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">fit</span><span class="p">,</span><span class="n">index_1</span><span class="p">,</span><span class="n">index_2</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_amount"><a class="viewcode-back" href="../gas_methods.html#gas_methods.calculate_amount">[docs]</a><span class="k">def</span> <span class="nf">calculate_amount</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">echem_time_df</span><span class="p">,</span><span class="n">gas_change_time_df</span><span class="p">,</span><span class="n">capture_parameter</span> <span class="o">=</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">,</span><span class="n">outgas_parameter</span> <span class="o">=</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">,</span><span class="n">baseline</span> <span class="o">=</span> <span class="s1">&#39;Adaptive&#39;</span><span class="p">,</span><span class="n">cycle</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">shift_periods</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    Reads a gas info dataset created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`, and a time period dataset by `find_echem_time_period`.</span>
+<span class="sd">    Calculates the amount of CO2 captured and released. Returns a dataset containing the cycle number, </span>
+<span class="sd">    captured amount, outgas amount, average amount, fitting parameters for capture and outgas, </span>
+<span class="sd">    and indices associated with the start and end of the capture/outgas processes.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    :type gas_df: pd.DataFrame</span>
+<span class="sd">    :param gas_df: dataset (created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`) that contains gas information</span>
+
+<span class="sd">    :type echem_time_df: pd.DataFrame</span>
+<span class="sd">    :param echem_time_df: dataset (created by `echem_method.find_echem_time_period`) that has process start and end</span>
+<span class="sd">                    time information</span>
+<span class="sd">    </span>
+<span class="sd">    :type gas_change_time_df: pd.DataFrame</span>
+<span class="sd">    :param gas_change_time_df: dataset (created by gas_methods.find_gas_change_time**) that has </span>
+<span class="sd">                    the time of gas composition change</span>
+
+<span class="sd">    :type capture_parameter: string</span>
+<span class="sd">    :param capture_parameter: The dataset attribute used for capture baseline fitting, usually &quot;Corrected_Flow_Right&quot;</span>
+
+<span class="sd">    :type outgas_parameter: string</span>
+<span class="sd">    :param outgas_parameter: (*To be done*) the dataset attribute used for outgas baseline fitting</span>
+
+<span class="sd">    :type baseline: string or float</span>
+<span class="sd">    :param baseline: enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline</span>
+
+<span class="sd">    </span>
+<span class="sd">    :rtype: *pd.DataFrame*</span>
+<span class="sd">    :return: </span>
+<span class="sd">          **dataset**: a dataset that contains the following attributes</span>
+<span class="sd">    </span>
+<span class="sd">          dataset[Cycle_Number] -&gt; (*int*):cycle_number\n</span>
+<span class="sd">          dataset[Capture_Amount] -&gt; (*float*): captured amount in this cycle\n</span>
+<span class="sd">          dataset[Outgas_Amount] -&gt; (*float*): released amount in this cycle\n</span>
+<span class="sd">          dataset[Average_Amount] -&gt; (*float*): average captured/released amount in this cycle\n</span>
+<span class="sd">          dataset[c0] -&gt; (*float*): slope of the capture baseline\n</span>
+<span class="sd">          dataset[c1] -&gt; (*float*): intercept of the capture baseline\n</span>
+<span class="sd">          dataset[o0] -&gt; (*float*): slope the outgas baseline\n</span>
+<span class="sd">          dataset[o1] -&gt; (*float*): intercept of the outgas baseline\n</span>
+<span class="sd">          dataset[c_start] -&gt; (*int*): index of the start of capture process\n</span>
+<span class="sd">          dataset[c_end] -&gt; (*int*): index of the end of capture process\n</span>
+<span class="sd">          dataset[o_start] -&gt; (*int*): index of the start of the release process\n</span>
+<span class="sd">          dataset[o_end]  -&gt; (*int*): index of the end of the release process\n</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">capture_amount_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">outgas_amount_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cycle_number</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">c0_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">c1_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">c_start_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">c_end_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">o0_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">o1_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">o_start_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">o_end_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+
+        
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cycle</span><span class="p">):</span>
+        <span class="n">charge_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Charge_Start_Time&#39;</span><span class="p">]</span>
+        <span class="n">capture_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Capture_Start_Time&#39;</span><span class="p">]</span>
+        <span class="n">discharge_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Discharge_Start_Time&#39;</span><span class="p">]</span>
+        <span class="n">outgas_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Outgas_Start_Time&#39;</span><span class="p">]</span>
+        <span class="n">outgas_end</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Outgas_End_Time&#39;</span><span class="p">]</span>
+        
+        <span class="n">low_to_high_switch</span> <span class="o">=</span> <span class="n">gas_change_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;low_to_high&#39;</span><span class="p">]</span>
+        <span class="n">high_to_low_switch</span> <span class="o">=</span> <span class="n">gas_change_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;high_to_low&#39;</span><span class="p">]</span>
+        
+        <span class="n">cycle_number</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">capture_amount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">outgas_amount</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="c1">#capture baseline parameter c,start_index and end_index</span>
+        <span class="n">c</span><span class="p">,</span><span class="n">c_start</span><span class="p">,</span><span class="n">c_end</span> <span class="o">=</span> <span class="n">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">charge_start</span><span class="p">,</span><span class="n">low_to_high_switch</span><span class="p">,</span><span class="n">capture_parameter</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="n">baseline_range</span><span class="p">)</span>
+        
+        <span class="c1">#outgas baseline parameter o1,o2</span>
+        <span class="n">o</span><span class="p">,</span><span class="n">o_start</span><span class="p">,</span><span class="n">o_end</span> <span class="o">=</span> <span class="n">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">discharge_start</span><span class="p">,</span><span class="n">high_to_low_switch</span><span class="p">,</span><span class="n">outgas_parameter</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="n">baseline_range</span><span class="p">)</span>
+        
+        <span class="n">c0_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">c1_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">c_start_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_start</span><span class="p">)</span>
+        <span class="n">c_end_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_end</span><span class="p">)</span>
+        
+        <span class="n">o0_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">o1_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">o_start_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o_start</span><span class="p">)</span>
+        <span class="n">o_end_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o_end</span><span class="p">)</span>
+        
+        <span class="n">capture_df</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">charge_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">low_to_high_switch</span><span class="p">)]</span>
+        <span class="n">outgas_df</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">discharge_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">high_to_low_switch</span><span class="p">)]</span>
+        
+        <span class="k">if</span> <span class="n">baseline</span> <span class="o">==</span> <span class="s1">&#39;Adaptive&#39;</span><span class="p">:</span>
+            <span class="c1">#capture at intermediate CO2 partial pressure</span>
+            <span class="k">if</span> <span class="n">capture_parameter</span> <span class="o">==</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">:</span>
+                <span class="n">capture_amount</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">capture_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">capture_parameter</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">capture_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span><span class="o">/</span><span class="mf">60.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">capture_amount</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">capture_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">capture_parameter</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">capture_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">*</span><span class="mf">11.7</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span>
+                
+            <span class="n">outgas_amount</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">outgas_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">outgas_parameter</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">outgas_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">/</span><span class="mf">60.0</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">capture_amount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">capture_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">parameter</span><span class="p">]</span><span class="o">-</span><span class="n">baseline</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="o">*</span><span class="n">capture_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">])</span>
+            <span class="n">outgas_amount</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">outgas_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">parameter</span><span class="p">]</span><span class="o">-</span><span class="n">baseline</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span><span class="p">)</span>
+
+
+
+        <span class="n">capture_amount_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">capture_amount</span><span class="p">)</span>
+        <span class="n">outgas_amount_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outgas_amount</span><span class="p">)</span>
+        <span class="n">average_amount_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">capture_amount_array</span><span class="p">))</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">outgas_amount_array</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Cycle_Number&#39;</span><span class="p">:</span><span class="n">cycle_number</span><span class="p">,</span>
+                            <span class="s1">&#39;Capture_Amount&#39;</span><span class="p">:</span><span class="n">capture_amount_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">:</span><span class="n">outgas_amount_array</span><span class="p">,</span>
+                            <span class="s1">&#39;Average_Amount&#39;</span><span class="p">:</span><span class="n">average_amount_array</span><span class="p">,</span>
+                            <span class="s1">&#39;c0&#39;</span><span class="p">:</span><span class="n">c0_array</span><span class="p">,</span>
+                            <span class="s1">&#39;c1&#39;</span><span class="p">:</span><span class="n">c1_array</span><span class="p">,</span>
+                            <span class="s1">&#39;o0&#39;</span><span class="p">:</span><span class="n">o0_array</span><span class="p">,</span>
+                            <span class="s1">&#39;o1&#39;</span><span class="p">:</span><span class="n">o1_array</span><span class="p">,</span>
+                            <span class="s1">&#39;c_start&#39;</span><span class="p">:</span><span class="n">c_start_array</span><span class="p">,</span>
+                            <span class="s1">&#39;c_end&#39;</span><span class="p">:</span><span class="n">c_end_array</span><span class="p">,</span>
+                            <span class="s1">&#39;o_start&#39;</span><span class="p">:</span><span class="n">o_start_array</span><span class="p">,</span>
+                            <span class="s1">&#39;o_end&#39;</span><span class="p">:</span><span class="n">o_end_array</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">dataset</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Martin Jin.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

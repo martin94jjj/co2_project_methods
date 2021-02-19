@@ -1,3 +1,6 @@
+
+License
+=======
 MIT License
 
 Copyright (c) 2021 martin94jjj
@@ -11,7 +14,7 @@ furnished to do so, subject to the following conditions:
 
 Anyone use this software should cite the following literature:
 
-Energy Environ. Sci., 2020,13, 3706-3722
+Jin *et al.*, *Energy Environ. Sci.*, 2020,**13**, 3706-3722
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.

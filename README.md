@@ -1,5 +1,8 @@
 # co2_project
 Methods for Analyzing Data for Electrochemical CO2 Capture Project
+### AUTHOR: Martin Jin                 ###
+### Date: 20210218                     ###
+
 
 Methods contain 
 
