@@ -59,7 +59,7 @@ def find_gas_change_time(gas_df,gas_switch_period = 7200,time_attribute='Datetim
             
 
 
-def create_baseline(gas_df,start,end,parameter = 'CO2_Flow',baseline_range = 100):
+def create_baseline(gas_df,start,end,parameter = 'CO2_Flow',baseline_range = 100,reverse_outgas_baseline_range=False):
     ''' 
     
     Reads a dataset created by `pd.read_csv()` on gas data or created by `utils.merge_echem_gas_df()`, 
@@ -82,7 +82,10 @@ def create_baseline(gas_df,start,end,parameter = 'CO2_Flow',baseline_range = 100
     :param parameter: The dataset attribute used for baseline fitting, usually 'Corrected_Flow_Right'
 
     :type baseline_range: int
-    :param baseline_range: number of points used for baseline fitting, usually 500-3000, depending on the length of capture/release period
+    :param baseline_range:  Number of points before capture start time and outgas end time used for baseline calculation. If **reverse_outgas_baseline_range** is True, use **baseline_range** points after outgas end time for baseline computation. Usually 500-3000, depending on the length of capture/release period
+
+    :type reverse_outgas_baseline_range: boolean
+    :param reverse_capture_baseline_range: Input True when you want to use **outgas_period** to calculate the outgased amount. 
 
 
     :rtype: *tuple*
@@ -95,7 +98,10 @@ def create_baseline(gas_df,start,end,parameter = 'CO2_Flow',baseline_range = 100
     index_2 = point2.index.values[0]
 
     x1 = gas_df.iloc[index_1-baseline_range:index_1]['Time_Delta'].values
-    x2 = gas_df.iloc[index_2-baseline_range:index_2]['Time_Delta'].values
+    if not reverse_outgas_baseline_range:
+        x2 = gas_df.iloc[index_2-baseline_range:index_2]['Time_Delta'].values
+    else:
+        x2 = gas_df.iloc[index_2:index_2+baseline_range]['Time_Delta'].values
     y1 = gas_df.iloc[index_1-baseline_range:index_1][parameter].values
     y2 = gas_df.iloc[index_2-baseline_range:index_2][parameter].values
     #solve a1x+a2 = y
@@ -109,7 +115,8 @@ def create_baseline(gas_df,start,end,parameter = 'CO2_Flow',baseline_range = 100
 
 
 
-def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter = 'Corrected_Flow_Right',outgas_parameter = 'Corrected_Flow_Right',baseline = 'Adaptive',cycle = 5, shift_periods = 0,baseline_range = 100):
+def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter = 'Corrected_Flow_Right',outgas_parameter = 'Corrected_Flow_Right',
+                        baseline = 'Adaptive',cycle = 5, shift_periods = 0,baseline_range = 100,capture_period=0,outgas_period=0,reverse_outgas_baseline_range=False):
     ''' 
     Reads a gas info dataset created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`, and a time period dataset by `find_echem_time_period`.
     Calculates the amount of CO2 captured and released. Returns a dataset containing the cycle number, 
@@ -135,9 +142,28 @@ def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter =
     :param outgas_parameter:  The dataset attribute used for outgas baseline fitting, usually "Corrected_Flow_Right"
 
     :type baseline: string or float
-    :param baseline: enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline
+    :param baseline: Enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline
 
+    :type cycle: int
+    :param cycle: Enter the number of capture/release cycles.
+
+    :type shift_periods: int
+    :param shift_periods: (*Need to double check*)Number of indices to shift the capture/release parameter
+
+    :type baseline_range: int
+    :param baseline_range: Number of points before capture start time and outgas end time used for baseline calculation. If **reverse_outgas_baseline_range** is True, use **baseline_range** points after outgas end time for baseline computation
+
+    :type capture_period: float
+    :param capture_period: Use when default baseline that uses entire echem_time_df['Charge_Start_Time'] to gas_change_time_df['low_to_high'] fails. Fill in the value in seconds representing the capture period, 
+    creates a baseline using the **baseline_range** values before echem_time_df['Charge_Start_Time'] and after the end of the capture period defined by echem_time_df['Charge_Start_Time']+**capture_period**.
     
+    :type outgas_period: float
+    :param outgas_period: Use when default baseline that uses entire echem_time_df['Discharge_Start_Time'] to gas_change_time_df['high_to_low'] fails. Fill in the value in seconds representing the outgas period, 
+    creates a baseline using the **baseline_range** values before echem_time_df['Discharge_Start_Time'] and after the end of the outgas period defined by echem_time_df['Discharge_Start_Time']+**outgas_period**.
+    
+    :type reverse_outgas_baseline_range: boolean
+    :param reverse_capture_baseline_range: Input True when you want to use **outgas_period** to calculate the outgased amount. 
+
     :rtype: *pd.DataFrame*
     :return: 
           **dataset**: a dataset that contains the following attributes
@@ -168,28 +194,30 @@ def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter =
     o1_array = []
     o_start_array = []
     o_end_array = []
-    index = 0
 
         
     for i in range(cycle):
-        charge_start = echem_time_df.iloc[i]['Charge_Start_Time']
-        capture_start = echem_time_df.iloc[i]['Capture_Start_Time']
-        discharge_start = echem_time_df.iloc[i]['Discharge_Start_Time']
-        outgas_start = echem_time_df.iloc[i]['Outgas_Start_Time']
-        outgas_end = echem_time_df.iloc[i]['Outgas_End_Time']
+        capture_start = echem_time_df.iloc[i]['Charge_Start_Time']
+        outgas_start = echem_time_df.iloc[i]['Discharge_Start_Time']
         
-        low_to_high_switch = gas_change_time_df.iloc[i]['low_to_high']
-        high_to_low_switch = gas_change_time_df.iloc[i]['high_to_low']
+        if not capture_period: 
+            capture_end = gas_change_time_df.iloc[i]['low_to_high']
+        else:
+            capture_end = capture_start+datetime.timedelta(0,capture_period)
+        if not outgas_period:
+            outgas_end = gas_change_time_df.iloc[i]['high_to_low']
+        else:
+            outgas_end = outgas_start+datetime.timedelta(0,outgas_period)
         
         cycle_number.append(i+1)
         capture_amount = 0
         outgas_amount = 0
         
         #capture baseline parameter c,start_index and end_index
-        c,c_start,c_end = create_baseline(gas_df,charge_start,low_to_high_switch,capture_parameter,baseline_range = baseline_range)
+        c,c_start,c_end = create_baseline(gas_df,capture_start,capture_end,capture_parameter,baseline_range = baseline_range)
         
         #outgas baseline parameter o1,o2
-        o,o_start,o_end = create_baseline(gas_df,discharge_start,high_to_low_switch,outgas_parameter,baseline_range = baseline_range)
+        o,o_start,o_end = create_baseline(gas_df,outgas_start,outgas_end,outgas_parameter,baseline_range = baseline_range,reverse_outgas_baseline_range=reverse_outgas_baseline_range)
         
         c0_array.append(c[0])
         c1_array.append(c[1])
@@ -201,8 +229,8 @@ def calculate_amount(gas_df,echem_time_df,gas_change_time_df,capture_parameter =
         o_start_array.append(o_start)
         o_end_array.append(o_end)
         
-        capture_df = gas_df[(gas_df['Datetime']>=charge_start) & (gas_df['Datetime']<low_to_high_switch)]
-        outgas_df = gas_df[(gas_df['Datetime']>=discharge_start) & (gas_df['Datetime']<high_to_low_switch)]
+        capture_df = gas_df[(gas_df['Datetime']>=capture_start) & (gas_df['Datetime']<capture_end)]
+        outgas_df = gas_df[(gas_df['Datetime']>=outgas_start) & (gas_df['Datetime']<outgas_end)]
         
         if baseline == 'Adaptive':
             #capture at intermediate CO2 partial pressure

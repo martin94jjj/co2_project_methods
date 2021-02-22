@@ -124,7 +124,7 @@ def TA_pH_wrapper(co2aq,solve_value = 0):
         return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)+10**-pH-solve_value
     return func
 
-def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.01):
+def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.01,flag=0):
     """
     Calculates DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\, given the echem_gas_dataframe(**total_df**)
     , **echem_time_df**, which tells the start and end of each echem process, **gas_change_time_df**, which tells when atmosphere CO2 is changed, and the
@@ -149,6 +149,9 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
 
     :type volume: float
     :param volume: Volume in litre. The volume of the electrolyte
+
+    :type flag: int
+    :param flag: flag for debug. 0 for not showing any message. 
 
     :rtype: *pd.DataFrame*
     :return: A dataset that contains DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\ for state 3'i, 1, 1', 3 and 3'f for each cycle.
@@ -183,7 +186,11 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
             if j == 0:
                 initial_index = (total_df[total_df['Datetime']==echem_time_df.iloc[i]['Charge_Start_Time']].index+1).values[0]
                 initial_entry = total_df.iloc[initial_index]
-                initial_pH = initial_entry['pH_right']
+                if i==0:
+                    initial_pH = initial_entry['pH_right']
+                else:
+                    initial_pH = np.average(total_df.iloc[initial_index-20:initial_index]['pH_right'])
+
                 initial_pCO2 = initial_entry['CO2 input right(abs val)']/(initial_entry['CO2 input right(abs val)']+initial_entry['N2 input right(abs val)'])
                 initial_co2aq = initial_pCO2*henry_constant
                 initial_TA = TA(initial_co2aq,initial_pH)
@@ -198,6 +205,8 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                 DIC_TA_array.append(initial_DIC)
                 DIC_eq_array.append(initial_DIC)
                 DIC_theory_array.append(initial_DIC)
+                if(flag):
+                    print("Cycle number:",i+1," state:",'3\'i', "co2aq: %0.2f"%initial_co2aq, "TA_val: %0.2f"%initial_TA,"pH measured: %0.2f"%initial_pH)
             else:
                 if j == 1:
                     state = '1'
@@ -219,8 +228,9 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                 co2aq = pCO2*henry_constant
                 
                 pH_func = TA_pH_wrapper(co2aq,solve_value = TA_val)
-                #print(co2aq,TA_val,pH_func(pH_measured),"                 ",pH_measured)
-                #display(entry)
+                if(flag):
+                    print("Cycle number:",i+1," state:",state, "co2aq: %0.2f"%co2aq, "TA_val: %0.2f"%TA_val,"pH_func(pH_measured): %0.2f"%pH_func(pH_measured),"pH measured: %0.2f"%pH_measured)
+                    #display(entry)
                 pH_theory = newton_krylov(pH_func,pH_measured)#use measured pH as the initial guess
                 #print(co2aq,TA_val,pH_func(pH_measured),pH_theory,pH_measured)
 
@@ -244,5 +254,3 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                          "pH_theory":pH_theory_array,"TA":TA_array,'DIC_TA':DIC_TA_array,
                          "DIC_eq":DIC_eq_array, "DIC_theory": DIC_theory_array,"index":index_array
                         })
-
-
