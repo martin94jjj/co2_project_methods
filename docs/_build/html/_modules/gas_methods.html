@@ -216,7 +216,7 @@
             
 
 
-<div class="viewcode-block" id="create_baseline"><a class="viewcode-back" href="../gas_methods.html#gas_methods.create_baseline">[docs]</a><span class="k">def</span> <span class="nf">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;CO2_Flow&#39;</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+<div class="viewcode-block" id="create_baseline"><a class="viewcode-back" href="../gas_methods.html#gas_methods.create_baseline">[docs]</a><span class="k">def</span> <span class="nf">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">parameter</span> <span class="o">=</span> <span class="s1">&#39;CO2_Flow&#39;</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span><span class="n">reverse_outgas_baseline_range</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; </span>
 <span class="sd">    </span>
 <span class="sd">    Reads a dataset created by `pd.read_csv()` on gas data or created by `utils.merge_echem_gas_df()`, </span>
@@ -239,12 +239,16 @@
 <span class="sd">    :param parameter: The dataset attribute used for baseline fitting, usually &#39;Corrected_Flow_Right&#39;</span>
 
 <span class="sd">    :type baseline_range: int</span>
-<span class="sd">    :param baseline_range: number of points used for baseline fitting, usually 500-3000, depending on the length of capture/release period</span>
+<span class="sd">    :param baseline_range:  Number of points before capture start time and outgas end time used for baseline calculation. If **reverse_outgas_baseline_range** is True, use **baseline_range** points after outgas end time for baseline computation. Usually 500-3000, depending on the length of capture/release period</span>
+
+<span class="sd">    :type reverse_outgas_baseline_range: boolean</span>
+<span class="sd">    :param reverse_capture_baseline_range: Input True when you want to use **outgas_period** to calculate the outgased amount. </span>
 
 
 <span class="sd">    :rtype: *tuple*</span>
 <span class="sd">    :return:</span>
 <span class="sd">          **(fit, a1,a2)** : A tuple containing fit, created by `np.polyfit(x,y,1)`, and parameter a1 and a2 of y=a1x+a2, on indices 0,1,2 respectively.</span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">point1</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">start</span><span class="p">]</span>
     <span class="n">point2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">end</span><span class="p">]</span>
@@ -252,7 +256,10 @@
     <span class="n">index_2</span> <span class="o">=</span> <span class="n">point2</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">x1</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_1</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_1</span><span class="p">][</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">x2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_2</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_2</span><span class="p">][</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">reverse_outgas_baseline_range</span><span class="p">:</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_2</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_2</span><span class="p">][</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_2</span><span class="p">:</span><span class="n">index_2</span><span class="o">+</span><span class="n">baseline_range</span><span class="p">][</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">y1</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_1</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_1</span><span class="p">][</span><span class="n">parameter</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">y2</span> <span class="o">=</span> <span class="n">gas_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index_2</span><span class="o">-</span><span class="n">baseline_range</span><span class="p">:</span><span class="n">index_2</span><span class="p">][</span><span class="n">parameter</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="c1">#solve a1x+a2 = y</span>
@@ -265,8 +272,8 @@
     <span class="k">return</span> <span class="n">fit</span><span class="p">,</span><span class="n">index_1</span><span class="p">,</span><span class="n">index_2</span></div>
 
 
-
-<div class="viewcode-block" id="calculate_amount"><a class="viewcode-back" href="../gas_methods.html#gas_methods.calculate_amount">[docs]</a><span class="k">def</span> <span class="nf">calculate_amount</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">echem_time_df</span><span class="p">,</span><span class="n">gas_change_time_df</span><span class="p">,</span><span class="n">capture_parameter</span> <span class="o">=</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">,</span><span class="n">outgas_parameter</span> <span class="o">=</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">,</span><span class="n">baseline</span> <span class="o">=</span> <span class="s1">&#39;Adaptive&#39;</span><span class="p">,</span><span class="n">cycle</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">shift_periods</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+<div class="viewcode-block" id="calculate_amount"><a class="viewcode-back" href="../gas_methods.html#gas_methods.calculate_amount">[docs]</a><span class="k">def</span> <span class="nf">calculate_amount</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">echem_time_df</span><span class="p">,</span><span class="n">gas_change_time_df</span><span class="p">,</span><span class="n">capture_parameter</span> <span class="o">=</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">,</span><span class="n">outgas_parameter</span> <span class="o">=</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">,</span>
+                        <span class="n">baseline</span> <span class="o">=</span> <span class="s1">&#39;Adaptive&#39;</span><span class="p">,</span><span class="n">cycle</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">shift_periods</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span><span class="n">capture_baseline_range</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">outgas_baseline_range</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">capture_period</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">outgas_period</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reverse_outgas_baseline_range</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; </span>
 <span class="sd">    Reads a gas info dataset created by `pd.read_csv()` on gas data or `utils.merge_echem_gas_df()`, and a time period dataset by `find_echem_time_period`.</span>
 <span class="sd">    Calculates the amount of CO2 captured and released. Returns a dataset containing the cycle number, </span>
@@ -292,9 +299,32 @@
 <span class="sd">    :param outgas_parameter:  The dataset attribute used for outgas baseline fitting, usually &quot;Corrected_Flow_Right&quot;</span>
 
 <span class="sd">    :type baseline: string or float</span>
-<span class="sd">    :param baseline: enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline</span>
+<span class="sd">    :param baseline: Enter a fixed baseline value (*float*) for CO2 flow or use the default adaptive baseline</span>
 
+<span class="sd">    :type cycle: int</span>
+<span class="sd">    :param cycle: Enter the number of capture/release cycles.</span>
+
+<span class="sd">    :type shift_periods: int</span>
+<span class="sd">    :param shift_periods: (*Need to double check*)Number of indices to shift the capture/release parameter</span>
+
+<span class="sd">    :type baseline_range: int</span>
+<span class="sd">    :param baseline_range: Number of points before capture start time and outgas end time used for baseline calculation. If **reverse_outgas_baseline_range** is True, use **baseline_range** points after outgas end time for baseline computation</span>
+
+<span class="sd">    :type capture_baseline_range: int</span>
+<span class="sd">    :param capture_baseline_range: Number of points before capture start and after capture end time only. Used for independent capture/outgas baseline calculation. </span>
+
+<span class="sd">    :type outgas_baseline_range: int</span>
+<span class="sd">    :param outgas)baseline_range: Number of points before outgas start and after outgas end time only. Used for independent capture/outgas baseline calculation. </span>
+
+<span class="sd">    :type capture_period: float</span>
+<span class="sd">    :param capture_period: Use when default baseline that uses entire echem_time_df[&#39;Charge_Start_Time&#39;] to gas_change_time_df[&#39;low_to_high&#39;] fails. Fill in the value in seconds representing the capture period, creates a baseline using the **baseline_range** values before echem_time_df[&#39;Charge_Start_Time&#39;] and after the end of the capture period defined by echem_time_df[&#39;Charge_Start_Time&#39;]+**capture_period**.</span>
 <span class="sd">    </span>
+<span class="sd">    :type outgas_period: float</span>
+<span class="sd">    :param outgas_period: Use when default baseline that uses entire echem_time_df[&#39;Discharge_Start_Time&#39;] to gas_change_time_df[&#39;high_to_low&#39;] fails. Fill in the value in seconds representing the outgas period, creates a baseline using the **baseline_range** values before echem_time_df[&#39;Discharge_Start_Time&#39;] and after the end of the outgas period defined by echem_time_df[&#39;Discharge_Start_Time&#39;]+**outgas_period**.</span>
+<span class="sd">    </span>
+<span class="sd">    :type reverse_outgas_baseline_range: boolean</span>
+<span class="sd">    :param reverse_capture_baseline_range: Input True when you want to use **outgas_period** to calculate the outgased amount. </span>
+
 <span class="sd">    :rtype: *pd.DataFrame*</span>
 <span class="sd">    :return: </span>
 <span class="sd">          **dataset**: a dataset that contains the following attributes</span>
@@ -325,28 +355,34 @@
     <span class="n">o1_array</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">o_start_array</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">o_end_array</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
 
         
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cycle</span><span class="p">):</span>
-        <span class="n">charge_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Charge_Start_Time&#39;</span><span class="p">]</span>
-        <span class="n">capture_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Capture_Start_Time&#39;</span><span class="p">]</span>
-        <span class="n">discharge_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Discharge_Start_Time&#39;</span><span class="p">]</span>
-        <span class="n">outgas_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Outgas_Start_Time&#39;</span><span class="p">]</span>
-        <span class="n">outgas_end</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Outgas_End_Time&#39;</span><span class="p">]</span>
+        <span class="n">capture_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Charge_Start_Time&#39;</span><span class="p">]</span>
+        <span class="n">outgas_start</span> <span class="o">=</span> <span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Discharge_Start_Time&#39;</span><span class="p">]</span>
         
-        <span class="n">low_to_high_switch</span> <span class="o">=</span> <span class="n">gas_change_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;low_to_high&#39;</span><span class="p">]</span>
-        <span class="n">high_to_low_switch</span> <span class="o">=</span> <span class="n">gas_change_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;high_to_low&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">capture_period</span><span class="p">:</span> 
+            <span class="n">capture_end</span> <span class="o">=</span> <span class="n">gas_change_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;low_to_high&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">capture_end</span> <span class="o">=</span> <span class="n">capture_start</span><span class="o">+</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">capture_period</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">outgas_period</span><span class="p">:</span>
+            <span class="n">outgas_end</span> <span class="o">=</span> <span class="n">gas_change_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;high_to_low&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">outgas_end</span> <span class="o">=</span> <span class="n">outgas_start</span><span class="o">+</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">outgas_period</span><span class="p">)</span>
         
         <span class="n">cycle_number</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">capture_amount</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">outgas_amount</span> <span class="o">=</span> <span class="mi">0</span>
         
         <span class="c1">#capture baseline parameter c,start_index and end_index</span>
-        <span class="n">c</span><span class="p">,</span><span class="n">c_start</span><span class="p">,</span><span class="n">c_end</span> <span class="o">=</span> <span class="n">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">charge_start</span><span class="p">,</span><span class="n">low_to_high_switch</span><span class="p">,</span><span class="n">capture_parameter</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="n">baseline_range</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">capture_baseline_range</span><span class="p">:</span>
+            <span class="n">baseline_range</span> <span class="o">=</span> <span class="n">capture_baseline_range</span>
+        <span class="n">c</span><span class="p">,</span><span class="n">c_start</span><span class="p">,</span><span class="n">c_end</span> <span class="o">=</span> <span class="n">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">capture_start</span><span class="p">,</span><span class="n">capture_end</span><span class="p">,</span><span class="n">capture_parameter</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="n">baseline_range</span><span class="p">)</span>
         
         <span class="c1">#outgas baseline parameter o1,o2</span>
-        <span class="n">o</span><span class="p">,</span><span class="n">o_start</span><span class="p">,</span><span class="n">o_end</span> <span class="o">=</span> <span class="n">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">discharge_start</span><span class="p">,</span><span class="n">high_to_low_switch</span><span class="p">,</span><span class="n">outgas_parameter</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="n">baseline_range</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outgas_baseline_range</span><span class="p">:</span>
+            <span class="n">baseline_range</span> <span class="o">=</span> <span class="n">outgas_baseline_range</span>
+        <span class="n">o</span><span class="p">,</span><span class="n">o_start</span><span class="p">,</span><span class="n">o_end</span> <span class="o">=</span> <span class="n">create_baseline</span><span class="p">(</span><span class="n">gas_df</span><span class="p">,</span><span class="n">outgas_start</span><span class="p">,</span><span class="n">outgas_end</span><span class="p">,</span><span class="n">outgas_parameter</span><span class="p">,</span><span class="n">baseline_range</span> <span class="o">=</span> <span class="n">baseline_range</span><span class="p">,</span><span class="n">reverse_outgas_baseline_range</span><span class="o">=</span><span class="n">reverse_outgas_baseline_range</span><span class="p">)</span>
         
         <span class="n">c0_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">c1_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -358,12 +394,12 @@
         <span class="n">o_start_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o_start</span><span class="p">)</span>
         <span class="n">o_end_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o_end</span><span class="p">)</span>
         
-        <span class="n">capture_df</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">charge_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">low_to_high_switch</span><span class="p">)]</span>
-        <span class="n">outgas_df</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">discharge_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">high_to_low_switch</span><span class="p">)]</span>
+        <span class="n">capture_df</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">capture_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">capture_end</span><span class="p">)]</span>
+        <span class="n">outgas_df</span> <span class="o">=</span> <span class="n">gas_df</span><span class="p">[(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">outgas_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">&lt;</span><span class="n">outgas_end</span><span class="p">)]</span>
         
         <span class="k">if</span> <span class="n">baseline</span> <span class="o">==</span> <span class="s1">&#39;Adaptive&#39;</span><span class="p">:</span>
             <span class="c1">#capture at intermediate CO2 partial pressure</span>
-            <span class="k">if</span> <span class="n">capture_parameter</span> <span class="o">==</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">capture_parameter</span> <span class="o">==</span> <span class="s1">&#39;Corrected_Flow_Right&#39;</span> <span class="ow">or</span> <span class="s1">&#39;CO2Flow&#39;</span><span class="p">:</span>
                 <span class="n">capture_amount</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">capture_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">capture_parameter</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">capture_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span><span class="o">/</span><span class="mf">60.0</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">capture_amount</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">capture_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">shift_periods</span><span class="p">)[</span><span class="n">capture_parameter</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">capture_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">*</span><span class="mf">11.7</span><span class="p">)</span><span class="o">/</span><span class="mf">60.0</span>

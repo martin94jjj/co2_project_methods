@@ -222,6 +222,34 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt id="plotting.plot_baseline_selection">
+<code class="sig-prename descclassname"><span class="pre">plotting.</span></code><code class="sig-name descname"><span class="pre">plot_baseline_selection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_change_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10800</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Capture</span> <span class="pre">Baseline</span> <span class="pre">Selection'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plotting.html#plot_baseline_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#plotting.plot_baseline_selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stack different cycles’ capture or release period with a vertical offset value. Used for manual baseline selection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_df</strong> (<em>pd.DataFrame</em>) – A dataset created by <cite>utils.merge_echem_gas_df</cite>. It contains electrochemistry and gas flow data</p></li>
+<li><p><strong>capture</strong> (<em>boolean</em>) – <em>True</em> if capture periods are to be stacked. <em>False</em> if reduce periods are to be stacked.</p></li>
+<li><p><strong>cycle</strong> (<em>int</em>) – Number of cycles.</p></li>
+<li><p><strong>time_change_period</strong> (<em>int</em>) – The period in seconds that gas change takes place.</p></li>
+<li><p><strong>start</strong> (<em>int</em>) – Index of the start of the baseline</p></li>
+<li><p><strong>end</strong> (<em>int</em>) – Index of the end of the baseline</p></li>
+<li><p><strong>vertical_offset</strong> (<em>float</em>) – Offset values to separate each capture/outgas period on y-axis</p></li>
+<li><p><strong>ymin</strong> (<em>float</em>) – Minimum of y-axis</p></li>
+<li><p><strong>ymax</strong> (<em>float</em>) – Maximum of y-axis</p></li>
+<li><p><strong>title</strong> (<em>string</em>) – Title of the plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Plot an image of the stacked baseline</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

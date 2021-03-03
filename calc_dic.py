@@ -124,7 +124,8 @@ def TA_pH_wrapper(co2aq,solve_value = 0):
         return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)+10**-pH-solve_value
     return func
 
-def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.01,flag=0):
+def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.01,flag=0,solver="newton_krylov"):
+    
     """
     Calculates DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\, given the echem_gas_dataframe(**total_df**)
     , **echem_time_df**, which tells the start and end of each echem process, **gas_change_time_df**, which tells when atmosphere CO2 is changed, and the
@@ -153,6 +154,9 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
     :type flag: int
     :param flag: flag for debug. 0 for not showing any message. 
 
+    :type solver: string
+    :param solver: name of scipy solver used for solving theoretical pH, given TA and co2aq (assuming equilibrium). The default solver is "newton_krylov". If encounter any issue, try "fsolve"
+
     :rtype: *pd.DataFrame*
     :return: A dataset that contains DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\ for state 3'i, 1, 1', 3 and 3'f for each cycle.
 
@@ -161,11 +165,16 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
         dataset['pH_measured'] -> (*float*): The measured pH value\n
         dataset['pH_theory'] -> (*float*): The theoretical pH value given pCO2 and TA\n
         dataset['TA'] -> (*float*): The total alkalinity concentration in Molar\n
-        dataset['DIC_TA'] -> (*float*): DIC \ :sub:`TA`\ value in Molar. DIC value calculated based on TA and measured pH, assuming no crossover of non-conservative ions.
-        dataset['DIC_eq'] -> (*float*): DIC \ :sub:`eq`\ value in Molar. DIC value calculated based on measured pH and assuming gas-solution equilibrium, i.e. co2aq = pCO2*0.035 (Henry's constant)
-        dataset['DIC_theory'] -> (*float*): DIC \ :sub:`theory,eq`\ value in Molar. DIC value calculated based on TA and theoretical pH.
-        dataset['index'] -> (*int*): The index in **total_df** where each of the above value is calculated.
+        dataset['DIC_TA'] -> (*float*): DIC \ :sub:`TA`\ value in Molar. DIC value calculated based on TA and measured pH, assuming no crossover of non-conservative ions.\n
+        dataset['DIC_eq'] -> (*float*): DIC \ :sub:`eq`\ value in Molar. DIC value calculated based on measured pH and assuming gas-solution equilibrium, i.e. co2aq = pCO2*0.035 (Henry's constant)\n
+        dataset['DIC_theory'] -> (*float*): DIC \ :sub:`theory,eq`\ value in Molar. DIC value calculated based on TA and theoretical pH.\n
+        dataset['index'] -> (*int*): The index in **total_df** where each of the above value is calculated.\n
+        dataset['Delta_DIC_TA'] -> (*float*) : The amount of DIC \ :sub:`TA`\ change in terms of Molar.\n
+        dataset['Delta_DIC_eq'] -> (*float*) : The amount of DIC \ :sub:`eq`\ change in terms of Molar.\n
+        dataset['Delta_DIC_theory'] -> (*float*) : The amount of DIC \ :sub:`theory,eq`\ change in terms of Molar.\n
+   
     """
+
     cycle_num = len(echem_time_df)
     
     index_array = []
@@ -177,6 +186,9 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
     DIC_TA_array = []
     DIC_eq_array = []
     DIC_theory_array = []
+    Delta_DIC_TA_array = []
+    Delta_DIC_eq_array = []
+    Delta_DIC_theory_array = []
     
     
     cycle_num = len(echem_time_df)
@@ -187,8 +199,10 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                 initial_index = (total_df[total_df['Datetime']==echem_time_df.iloc[i]['Charge_Start_Time']].index+1).values[0]
                 initial_entry = total_df.iloc[initial_index]
                 if i==0:
+                    
                     initial_pH = initial_entry['pH_right']
                 else:
+                    #initial index and previous 20 indices for calculating a more reliable initial pH
                     initial_pH = np.average(total_df.iloc[initial_index-20:initial_index]['pH_right'])
 
                 initial_pCO2 = initial_entry['CO2 input right(abs val)']/(initial_entry['CO2 input right(abs val)']+initial_entry['N2 input right(abs val)'])
@@ -205,8 +219,11 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                 DIC_TA_array.append(initial_DIC)
                 DIC_eq_array.append(initial_DIC)
                 DIC_theory_array.append(initial_DIC)
+                Delta_DIC_TA_array.append(0)
+                Delta_DIC_eq_array.append(0)
+                Delta_DIC_theory_array.append(0)
                 if(flag):
-                    print("Cycle number:",i+1," state:",'3\'i', "co2aq: %0.2f"%initial_co2aq, "TA_val: %0.2f"%initial_TA,"pH measured: %0.2f"%initial_pH)
+                    print("Cycle number:",i+1," state:",'3\'i', "co2aq: %0.3f"%initial_co2aq, "TA_val: %0.2f"%initial_TA,"pH measured: %0.2f"%initial_pH)
             else:
                 if j == 1:
                     state = '1'
@@ -229,9 +246,12 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                 
                 pH_func = TA_pH_wrapper(co2aq,solve_value = TA_val)
                 if(flag):
-                    print("Cycle number:",i+1," state:",state, "co2aq: %0.2f"%co2aq, "TA_val: %0.2f"%TA_val,"pH_func(pH_measured): %0.2f"%pH_func(pH_measured),"pH measured: %0.2f"%pH_measured)
+                    print("Cycle number:",i+1," state:",state, "co2aq: %0.3f"%co2aq, "TA_val: %0.2f"%TA_val,"pH_func(pH_measured): %0.2f"%pH_func(pH_measured),"pH measured: %0.2f"%pH_measured)
                     #display(entry)
-                pH_theory = newton_krylov(pH_func,pH_measured)#use measured pH as the initial guess
+                if solver == "newton_krylov":
+                    pH_theory = newton_krylov(pH_func,pH_measured)#use measured pH as the initial guess
+                elif solver == "fsolve":
+                    pH_theory = fsolve(pH_func,pH_measured)[0]
                 #print(co2aq,TA_val,pH_func(pH_measured),pH_theory,pH_measured)
 
                 co2aq_TA = fsolve(TA,co2aq,args=(pH_measured,TA_val))[0]# non-equilibrium co2aq, calculated from TA,use equilibrium co2aq as initial guess
@@ -249,8 +269,15 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                 DIC_TA_array.append(DIC_TA)
                 DIC_eq_array.append(DIC_eq)
                 DIC_theory_array.append(DIC_theory)
+                
+                #calculate delta dic
+                Delta_DIC_TA_array.append(DIC_TA-DIC_TA_array[-2])
+                Delta_DIC_eq_array.append(DIC_eq-DIC_eq_array[-2])
+                Delta_DIC_theory_array.append(DIC_theory-DIC_theory_array[-2])
     
     return pd.DataFrame({"Cycle":cycle_array,"State":states_array,"pH_measured" :pH_measured_array,
                          "pH_theory":pH_theory_array,"TA":TA_array,'DIC_TA':DIC_TA_array,
-                         "DIC_eq":DIC_eq_array, "DIC_theory": DIC_theory_array,"index":index_array
+                         "DIC_eq":DIC_eq_array, "DIC_theory": DIC_theory_array,"index":index_array,
+                         "Delta_DIC_TA":Delta_DIC_TA_array,"Delta_DIC_eq":Delta_DIC_eq_array,
+                         "Delta_DIC_theory":Delta_DIC_theory_array
                         })

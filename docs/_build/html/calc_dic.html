@@ -251,7 +251,7 @@ or <strong>pH</strong> given TA value (enter targeting TA value for <strong>solv
 
 <dl class="py function">
 <dt id="calc_dic.calc_DIC">
-<code class="sig-prename descclassname"><span class="pre">calc_dic.</span></code><code class="sig-name descname"><span class="pre">calc_DIC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">echem_time_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gas_change_time_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calc_dic.html#calc_DIC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calc_dic.calc_DIC" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">calc_dic.</span></code><code class="sig-name descname"><span class="pre">calc_DIC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">echem_time_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gas_change_time_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'newton_krylov'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calc_dic.html#calc_DIC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calc_dic.calc_DIC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates DIC <sub>TA</sub>, DIC <sub>eq</sub>, pH  <sub>theory,eq</sub>and DIC <sub>theory,eq</sub>, given the echem_gas_dataframe(<strong>total_df</strong>)
 , <strong>echem_time_df</strong>, which tells the start and end of each echem process, <strong>gas_change_time_df</strong>, which tells when atmosphere CO2 is changed, and the
 <strong>volume</strong> of the electrolyte in L.</p>
@@ -266,6 +266,8 @@ Other states’ values are calculated given TA, and using other functions in thi
 <li><p><strong>gas_change_time_df</strong> (<em>pd.DataFrame</em>) – A pandas dataframe, created by ‘gas_methods.find_gas_change_time()’ function, that contains the timing of when atmosphere CO2 is changed</p></li>
 <li><p><strong>outgas_shift</strong> (<em>int</em>) – Time in seconds. Offsets inaccurate timing in <strong>echem_time_df</strong> or <strong>gas_change_time_df</strong></p></li>
 <li><p><strong>volume</strong> (<em>float</em>) – Volume in litre. The volume of the electrolyte</p></li>
+<li><p><strong>flag</strong> (<em>int</em>) – flag for debug. 0 for not showing any message.</p></li>
+<li><p><strong>solver</strong> (<em>string</em>) – name of scipy solver used for solving theoretical pH, given TA and co2aq (assuming equilibrium). The default solver is “newton_krylov”. If encounter any issue, try “fsolve”</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -278,10 +280,13 @@ Other states’ values are calculated given TA, and using other functions in thi
 <p>dataset[‘pH_measured’] -&gt; (<em>float</em>): The measured pH value</p>
 <p>dataset[‘pH_theory’] -&gt; (<em>float</em>): The theoretical pH value given pCO2 and TA</p>
 <p>dataset[‘TA’] -&gt; (<em>float</em>): The total alkalinity concentration in Molar</p>
-<p>dataset[‘DIC_TA’] -&gt; (<em>float</em>): DIC <sub>TA</sub>value in Molar. DIC value calculated based on TA and measured pH, assuming no crossover of non-conservative ions.
-dataset[‘DIC_eq’] -&gt; (<em>float</em>): DIC <sub>eq</sub>value in Molar. DIC value calculated based on measured pH and assuming gas-solution equilibrium, i.e. co2aq = pCO2*0.035 (Henry’s constant)
-dataset[‘DIC_theory’] -&gt; (<em>float</em>): DIC <sub>theory,eq</sub>value in Molar. DIC value calculated based on TA and theoretical pH.
-dataset[‘index’] -&gt; (<em>int</em>): The index in <strong>total_df</strong> where each of the above value is calculated.</p>
+<p>dataset[‘DIC_TA’] -&gt; (<em>float</em>): DIC <sub>TA</sub>value in Molar. DIC value calculated based on TA and measured pH, assuming no crossover of non-conservative ions.</p>
+<p>dataset[‘DIC_eq’] -&gt; (<em>float</em>): DIC <sub>eq</sub>value in Molar. DIC value calculated based on measured pH and assuming gas-solution equilibrium, i.e. co2aq = pCO2*0.035 (Henry’s constant)</p>
+<p>dataset[‘DIC_theory’] -&gt; (<em>float</em>): DIC <sub>theory,eq</sub>value in Molar. DIC value calculated based on TA and theoretical pH.</p>
+<p>dataset[‘index’] -&gt; (<em>int</em>): The index in <strong>total_df</strong> where each of the above value is calculated.</p>
+<p>dataset[‘Delta_DIC_TA’] -&gt; (<em>float</em>) : The amount of DIC <sub>TA</sub>change in terms of Molar.</p>
+<p>dataset[‘Delta_DIC_eq’] -&gt; (<em>float</em>) : The amount of DIC <sub>eq</sub>change in terms of Molar.</p>
+<p>dataset[‘Delta_DIC_theory’] -&gt; (<em>float</em>) : The amount of DIC <sub>theory,eq</sub>change in terms of Molar.</p>
 </p>
 </dd>
 </dl>

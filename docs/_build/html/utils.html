@@ -194,9 +194,79 @@
 <div class="section" id="module-utils">
 <span id="utils-module"></span><h1>utils module<a class="headerlink" href="#module-utils" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
+<dt id="utils.merge_amount_dic_df">
+<code class="sig-prename descclassname"><span class="pre">utils.</span></code><code class="sig-name descname"><span class="pre">merge_amount_dic_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dic_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pco2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#merge_amount_dic_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.merge_amount_dic_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge <strong>amount_df</strong> and states 1 and 3 of <strong>dic_df</strong> together so comparing experimental cpatured amount
+and theoretical amount is easy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dic_df</strong> (<em>pd.DataFrame</em>) – A dataset created by <cite>calc_dic.calc_DIC()</cite> function that contains DIC info at different state and different capture or release amount between states.</p></li>
+<li><p><strong>amount_df</strong> (<em>pd.DataFrame</em>) – A dataset created by <cite>gas_methods.calculate_amount()</cite> function. This dataset contains capture and release amount of CO2 in mL.</p></li>
+<li><p><strong>volume</strong> (<em>float</em>) – Volume in litre. Usually is 0.01 or 10 mL</p></li>
+<li><p><strong>pco2</strong> (<em>float</em>) – pCO2 during capture. Used for correcting Delta_DIC_outgas_exp to effective Delta_DIC using an absolute measure (difference in DIC is only from co2aq difference at 1 bar pCO2 and <strong>pco2</strong> bar pCO2).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>Merged dataset containing Delta_DIC of different source (experimental, TA, eq and theory,eq)</p>
+<p>dataset[‘Delta_DIC_capture_exp’] -&gt; (<em>float</em>): Delta DIC measured during capture according to gas flow</p>
+<p>dataset[‘Delta_DIC_outgas_exp’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to gas flow</p>
+<p>dataset[‘Delta_DIC_TA_capture’] -&gt; (<em>float</em>): Delta DIC measured during capture according to TA and measured pH</p>
+<p>dataset[‘Delta_DIC_TA_outgas’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to TA and measured pH</p>
+<p>dataset[‘Delta_DIC_eq_capture’] -&gt; (<em>float</em>): Delta DIC measured during capture according to measured pH and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_eq_outgas’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to measured pH and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_theory_capture’] -&gt; (<em>float</em>): Delta DIC measured during capture according to TA and theoretical pH given TA and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_theory_outgas’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to TA and theoretical pH given TA and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_TA_effective’] -&gt; (<em>float</em>): Effective Delta DIC TA (DIC_TA difference in state 1 and 3)</p>
+<p>dataset[‘Delta_DIC_eq_effective’] -&gt; (<em>float</em>): Effective Delta DIC eq (DIC_eq difference in state 1 and 3)</p>
+<p>dataset[‘Delta_DIC_theory_effective’] -&gt; (<em>float</em>): Effective Delta DIC theory (DIC_theory difference in state 1 and 3)</p>
+<p>dataset[‘Delta_DIC_exp_TA_effective’] -&gt; (<em>float</em>): Effective Delta DIC_exp corrected by dataset[‘Delta_DIC_outgas_exp’]*dataset[‘Delta_DIC_TA_effective’]/dataset[‘Delta_DIC_TA_outgas’] (Assuming two types of measurements give similar results)</p>
+<p>dataset[‘Delta_DIC_exp_abs_effective’] -&gt; (<em>float</em>): Effective Delta DIC_exp corrected by dataset[‘Delta_DIC_outgas_exp’]-(1-<strong>pco2</strong>)*0.035 (Assume the difference in outgas Delta_DIC_measured and effective Delta_DIC is the difference in co2aq)</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="utils.merge_echemEnergy_amountDIC_df">
+<code class="sig-prename descclassname"><span class="pre">utils.</span></code><code class="sig-name descname"><span class="pre">merge_echemEnergy_amountDIC_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">echem_energy_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount_DIC_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#merge_echemEnergy_amountDIC_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.merge_echemEnergy_amountDIC_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge <strong>echem_energy_df</strong> and <strong>amount_DIC_df</strong>, includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively
+(Delta_DIC in bewtween states 1 and 3 (now only on outgasd amount)), and includes CO2 captured or released per electron.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>echem_energy_df</strong> (<em>pd.DataFrame</em>) – A dataset created by <cite>echem_methods.cal_capacity_energy()</cite> function. The dataset contains capacity and energy information.</p></li>
+<li><p><strong>amount_DIC_df</strong> – A dataset created by <cite>utils.merge_amount_dic_df()</cite> function. The dataset contains Delta DIC calculated using various sources.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A merged dataset that includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively (Delta_DIC in bewtween state3 1 and 3), and includes CO2 captured or released per electron.</p>
+<p>dataset[‘deacidification_work(kJ/molCO2)’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Outgas_amount,
+dataset[‘acidification_work(kJ/molCO2)’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Outgas_amount
+dataset[‘cycle_work(kJ/molCO2)’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Outgas_amount
+dataset[‘co2_captured/electron’] -&gt; (<em>float</em>): mol of CO2 captured over mol of charge capacity
+dataset[‘co2_outgassed/electron’] -&gt; (<em>float</em>): mol of CO2 outgassed over mol of discharge capacity</p>
+<p>dataset[‘deacidification_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective
+dataset[‘acidification_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective
+dataset[‘cycle_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective</p>
+<p>dataset[‘deacidification_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective
+dataset[‘acidification_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective
+dataset[‘cycle_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="utils.merge_echem_gas_df">
-<code class="sig-prename descclassname"><span class="pre">utils.</span></code><code class="sig-name descname"><span class="pre">merge_echem_gas_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">echem_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gas_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_fit_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'../20210103_right_CO2_sensor_cubic_spline_fit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_loop_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#merge_echem_gas_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.merge_echem_gas_df" title="Permalink to this definition">¶</a></dt>
-<dd><p>Merge <strong>echem_df</strong>, created by <cite>echem_methods.read_echem()</cite> function and <strong>gas_df</strong>, created by <a href="#id1"><span class="problematic" id="id2">`</span></a>pd.read_csv()’ on gas data, on newly created [‘Time_Delta’] attribute.
+<code class="sig-prename descclassname"><span class="pre">utils.</span></code><code class="sig-name descname"><span class="pre">merge_echem_gas_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">echem_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gas_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_fit_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'../20210103_right_CO2_sensor_cubic_spline_fit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_loop_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2_heat_conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.685</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#merge_echem_gas_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.merge_echem_gas_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge <strong>echem_df</strong>, created by <cite>echem_methods.read_echem()</cite> function and <strong>gas_df</strong>, created by <cite>pd.read_csv()</cite> on gas data, on newly created [‘Time_Delta’] attribute.
 Add [‘right_pco2’] attribute to the merged dataset. The [‘right_pco2’] attribute is created by using a previously-prepared cubic spline fit that
 fits CO2 sensor analog signal to actual CO2 partial pressure.</p>
 <dl class="field-list simple">
@@ -205,16 +275,23 @@ fits CO2 sensor analog signal to actual CO2 partial pressure.</p>
 <li><p><strong>echem_df</strong> (<em>pd.DataFrame</em>) – A dataset created by <cite>echem_methods.read_echem()</cite> function that contains all electrochemistry data (voltage, current, pH, etc.)</p></li>
 <li><p><strong>gas_df</strong> (<em>pd.DataFrame</em>) – A dataset created by pd.read_csv()’ on gas data that contains all gas data (pCO2, flow rate, mass flow controller input, etc.)</p></li>
 <li><p><strong>co2_fit_path</strong> (<em>string</em>) – The path to the cublic spline fit made for fitting CO2 sensor analog input to actual CO2 partial pressure.</p></li>
-<li><p><strong>max_loop_num</strong> (<em>int</em>) – Maximum number of loops in Arduino when controlling gas input. Each loop accounts for one change of gas composition.
-e.g. change from 0.1 bar pCO2 to 1 bar is one loop and changing from 1 bar to 0.1 bar is another loop. Usually one battery cycle
-contains two gas-change loops.</p></li>
+<li><p><strong>max_loop_num</strong> (<em>int</em>) – Maximum number of loops in Arduino when controlling gas input. Each loop accounts for one change of gas composition. e.g. change from 0.1 bar pCO2 to 1 bar is one loop and changing from 1 bar to 0.1 bar is another loop. Usually one battery cycle contains two gas-change loops.</p></li>
+<li><p><strong>co2_heat_conductivity</strong> (<em>float</em>) – Ratio of CO2 heat conductivity over N2 heat conductivity (flow sensor dependent). This value should be obtained through calibrating CO2 sensor and flow sensor. This value may change over time as sensor is corroded by humidity.</p></li>
+<li><p><strong>flow_offset</strong> (<em>float</em>) – Offset in sccm. This is the difference between measured flow rate and the flow rate set by mass flow controllers. The offset is likely caused by accumulated problems of flow meter over time.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><em>pd.DataFrame</em></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Merged dataset containing, original <strong>echem_df</strong> and <strong>gas_df</strong> datasets, plus extra [‘right_pco2’] attribute.</p>
+<dd class="field-odd"><p><p>Merged dataset containing, original <strong>echem_df</strong> and <strong>gas_df</strong> datasets, plus extra [‘right_pco2’] attribute.
+Below is the list of additional attributes:</p>
+<p>dataset[‘Time_Delta’]-&gt; (<em>int</em>): Time difference with respect to the start of the experiment.</p>
+<p>dataset[‘right_pco2’]-&gt; (<em>float</em>): CO2 partial pressure in bar. Converted from <strong>CO2 sensor right</strong> by previously determined spline-fit on analog input and CO2 partial pressure
+dataset[‘Corrected_Flow_Right’] -&gt; (<em>float</em>): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.
+dataset[‘Corrected_Flow_Right_filtered’] -&gt; (<em>float</em>): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. <cite>scipy.lfilter</cite> is used to filtered the signal.
+dataset[‘CO2Flow]-&gt; (<em>float</em>): Product of dataset[‘Corrected_Flow_Right’] and dataset[‘right_pco2’]. The flow rate of pure CO2.</p>
+</p>
 </dd>
 </dl>
 </dd></dl>

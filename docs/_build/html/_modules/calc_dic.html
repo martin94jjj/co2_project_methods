@@ -281,7 +281,8 @@
         <span class="k">return</span> <span class="n">kw</span><span class="o">/</span><span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="n">pH</span><span class="p">)</span><span class="o">+</span><span class="n">hco3</span><span class="p">(</span><span class="n">co2aq</span><span class="p">,</span><span class="n">pH</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">co32</span><span class="p">(</span><span class="n">co2aq</span><span class="p">,</span><span class="n">pH</span><span class="p">)</span><span class="o">+</span><span class="mi">10</span><span class="o">**-</span><span class="n">pH</span><span class="o">-</span><span class="n">solve_value</span>
     <span class="k">return</span> <span class="n">func</span></div>
 
-<div class="viewcode-block" id="calc_DIC"><a class="viewcode-back" href="../calc_dic.html#calc_dic.calc_DIC">[docs]</a><span class="k">def</span> <span class="nf">calc_DIC</span><span class="p">(</span><span class="n">total_df</span><span class="p">,</span><span class="n">echem_time_df</span><span class="p">,</span><span class="n">gas_change_time_df</span><span class="p">,</span><span class="n">outgas_shift</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">volume</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+<div class="viewcode-block" id="calc_DIC"><a class="viewcode-back" href="../calc_dic.html#calc_dic.calc_DIC">[docs]</a><span class="k">def</span> <span class="nf">calc_DIC</span><span class="p">(</span><span class="n">total_df</span><span class="p">,</span><span class="n">echem_time_df</span><span class="p">,</span><span class="n">gas_change_time_df</span><span class="p">,</span><span class="n">outgas_shift</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">volume</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span><span class="n">flag</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;newton_krylov&quot;</span><span class="p">):</span>
+    
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\, given the echem_gas_dataframe(**total_df**)</span>
 <span class="sd">    , **echem_time_df**, which tells the start and end of each echem process, **gas_change_time_df**, which tells when atmosphere CO2 is changed, and the</span>
@@ -307,6 +308,12 @@
 <span class="sd">    :type volume: float</span>
 <span class="sd">    :param volume: Volume in litre. The volume of the electrolyte</span>
 
+<span class="sd">    :type flag: int</span>
+<span class="sd">    :param flag: flag for debug. 0 for not showing any message. </span>
+
+<span class="sd">    :type solver: string</span>
+<span class="sd">    :param solver: name of scipy solver used for solving theoretical pH, given TA and co2aq (assuming equilibrium). The default solver is &quot;newton_krylov&quot;. If encounter any issue, try &quot;fsolve&quot;</span>
+
 <span class="sd">    :rtype: *pd.DataFrame*</span>
 <span class="sd">    :return: A dataset that contains DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\ for state 3&#39;i, 1, 1&#39;, 3 and 3&#39;f for each cycle.</span>
 
@@ -315,11 +322,16 @@
 <span class="sd">        dataset[&#39;pH_measured&#39;] -&gt; (*float*): The measured pH value\n</span>
 <span class="sd">        dataset[&#39;pH_theory&#39;] -&gt; (*float*): The theoretical pH value given pCO2 and TA\n</span>
 <span class="sd">        dataset[&#39;TA&#39;] -&gt; (*float*): The total alkalinity concentration in Molar\n</span>
-<span class="sd">        dataset[&#39;DIC_TA&#39;] -&gt; (*float*): DIC \ :sub:`TA`\ value in Molar. DIC value calculated based on TA and measured pH, assuming no crossover of non-conservative ions.</span>
-<span class="sd">        dataset[&#39;DIC_eq&#39;] -&gt; (*float*): DIC \ :sub:`eq`\ value in Molar. DIC value calculated based on measured pH and assuming gas-solution equilibrium, i.e. co2aq = pCO2*0.035 (Henry&#39;s constant)</span>
-<span class="sd">        dataset[&#39;DIC_theory&#39;] -&gt; (*float*): DIC \ :sub:`theory,eq`\ value in Molar. DIC value calculated based on TA and theoretical pH.</span>
-<span class="sd">        dataset[&#39;index&#39;] -&gt; (*int*): The index in **total_df** where each of the above value is calculated.</span>
+<span class="sd">        dataset[&#39;DIC_TA&#39;] -&gt; (*float*): DIC \ :sub:`TA`\ value in Molar. DIC value calculated based on TA and measured pH, assuming no crossover of non-conservative ions.\n</span>
+<span class="sd">        dataset[&#39;DIC_eq&#39;] -&gt; (*float*): DIC \ :sub:`eq`\ value in Molar. DIC value calculated based on measured pH and assuming gas-solution equilibrium, i.e. co2aq = pCO2*0.035 (Henry&#39;s constant)\n</span>
+<span class="sd">        dataset[&#39;DIC_theory&#39;] -&gt; (*float*): DIC \ :sub:`theory,eq`\ value in Molar. DIC value calculated based on TA and theoretical pH.\n</span>
+<span class="sd">        dataset[&#39;index&#39;] -&gt; (*int*): The index in **total_df** where each of the above value is calculated.\n</span>
+<span class="sd">        dataset[&#39;Delta_DIC_TA&#39;] -&gt; (*float*) : The amount of DIC \ :sub:`TA`\ change in terms of Molar.\n</span>
+<span class="sd">        dataset[&#39;Delta_DIC_eq&#39;] -&gt; (*float*) : The amount of DIC \ :sub:`eq`\ change in terms of Molar.\n</span>
+<span class="sd">        dataset[&#39;Delta_DIC_theory&#39;] -&gt; (*float*) : The amount of DIC \ :sub:`theory,eq`\ change in terms of Molar.\n</span>
+<span class="sd">   </span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">cycle_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">echem_time_df</span><span class="p">)</span>
     
     <span class="n">index_array</span> <span class="o">=</span> <span class="p">[]</span>
@@ -331,6 +343,9 @@
     <span class="n">DIC_TA_array</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">DIC_eq_array</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">DIC_theory_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">Delta_DIC_TA_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">Delta_DIC_eq_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">Delta_DIC_theory_array</span> <span class="o">=</span> <span class="p">[]</span>
     
     
     <span class="n">cycle_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">echem_time_df</span><span class="p">)</span>
@@ -340,7 +355,13 @@
             <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">initial_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_df</span><span class="p">[</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">echem_time_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Charge_Start_Time&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">initial_entry</span> <span class="o">=</span> <span class="n">total_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">initial_index</span><span class="p">]</span>
-                <span class="n">initial_pH</span> <span class="o">=</span> <span class="n">initial_entry</span><span class="p">[</span><span class="s1">&#39;pH_right&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    
+                    <span class="n">initial_pH</span> <span class="o">=</span> <span class="n">initial_entry</span><span class="p">[</span><span class="s1">&#39;pH_right&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#initial index and previous 20 indices for calculating a more reliable initial pH</span>
+                    <span class="n">initial_pH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">total_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">initial_index</span><span class="o">-</span><span class="mi">20</span><span class="p">:</span><span class="n">initial_index</span><span class="p">][</span><span class="s1">&#39;pH_right&#39;</span><span class="p">])</span>
+
                 <span class="n">initial_pCO2</span> <span class="o">=</span> <span class="n">initial_entry</span><span class="p">[</span><span class="s1">&#39;CO2 input right(abs val)&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">initial_entry</span><span class="p">[</span><span class="s1">&#39;CO2 input right(abs val)&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">initial_entry</span><span class="p">[</span><span class="s1">&#39;N2 input right(abs val)&#39;</span><span class="p">])</span>
                 <span class="n">initial_co2aq</span> <span class="o">=</span> <span class="n">initial_pCO2</span><span class="o">*</span><span class="n">henry_constant</span>
                 <span class="n">initial_TA</span> <span class="o">=</span> <span class="n">TA</span><span class="p">(</span><span class="n">initial_co2aq</span><span class="p">,</span><span class="n">initial_pH</span><span class="p">)</span>
@@ -355,6 +376,11 @@
                 <span class="n">DIC_TA_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initial_DIC</span><span class="p">)</span>
                 <span class="n">DIC_eq_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initial_DIC</span><span class="p">)</span>
                 <span class="n">DIC_theory_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initial_DIC</span><span class="p">)</span>
+                <span class="n">Delta_DIC_TA_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">Delta_DIC_eq_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">Delta_DIC_theory_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">flag</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cycle number:&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot; state:&quot;</span><span class="p">,</span><span class="s1">&#39;3</span><span class="se">\&#39;</span><span class="s1">i&#39;</span><span class="p">,</span> <span class="s2">&quot;co2aq: </span><span class="si">%0.3f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">initial_co2aq</span><span class="p">,</span> <span class="s2">&quot;TA_val: </span><span class="si">%0.2f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">initial_TA</span><span class="p">,</span><span class="s2">&quot;pH measured: </span><span class="si">%0.2f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">initial_pH</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
@@ -376,9 +402,13 @@
                 <span class="n">co2aq</span> <span class="o">=</span> <span class="n">pCO2</span><span class="o">*</span><span class="n">henry_constant</span>
                 
                 <span class="n">pH_func</span> <span class="o">=</span> <span class="n">TA_pH_wrapper</span><span class="p">(</span><span class="n">co2aq</span><span class="p">,</span><span class="n">solve_value</span> <span class="o">=</span> <span class="n">TA_val</span><span class="p">)</span>
-                <span class="c1">#print(co2aq,TA_val,pH_func(pH_measured),&quot;                 &quot;,pH_measured)</span>
-                <span class="c1">#display(entry)</span>
-                <span class="n">pH_theory</span> <span class="o">=</span> <span class="n">newton_krylov</span><span class="p">(</span><span class="n">pH_func</span><span class="p">,</span><span class="n">pH_measured</span><span class="p">)</span><span class="c1">#use measured pH as the initial guess</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">flag</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cycle number:&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot; state:&quot;</span><span class="p">,</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;co2aq: </span><span class="si">%0.3f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">co2aq</span><span class="p">,</span> <span class="s2">&quot;TA_val: </span><span class="si">%0.2f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">TA_val</span><span class="p">,</span><span class="s2">&quot;pH_func(pH_measured): </span><span class="si">%0.2f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">pH_func</span><span class="p">(</span><span class="n">pH_measured</span><span class="p">),</span><span class="s2">&quot;pH measured: </span><span class="si">%0.2f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">pH_measured</span><span class="p">)</span>
+                    <span class="c1">#display(entry)</span>
+                <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;newton_krylov&quot;</span><span class="p">:</span>
+                    <span class="n">pH_theory</span> <span class="o">=</span> <span class="n">newton_krylov</span><span class="p">(</span><span class="n">pH_func</span><span class="p">,</span><span class="n">pH_measured</span><span class="p">)</span><span class="c1">#use measured pH as the initial guess</span>
+                <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;fsolve&quot;</span><span class="p">:</span>
+                    <span class="n">pH_theory</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">pH_func</span><span class="p">,</span><span class="n">pH_measured</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="c1">#print(co2aq,TA_val,pH_func(pH_measured),pH_theory,pH_measured)</span>
 
                 <span class="n">co2aq_TA</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">TA</span><span class="p">,</span><span class="n">co2aq</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">pH_measured</span><span class="p">,</span><span class="n">TA_val</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="c1"># non-equilibrium co2aq, calculated from TA,use equilibrium co2aq as initial guess</span>
@@ -396,13 +426,18 @@
                 <span class="n">DIC_TA_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DIC_TA</span><span class="p">)</span>
                 <span class="n">DIC_eq_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DIC_eq</span><span class="p">)</span>
                 <span class="n">DIC_theory_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DIC_theory</span><span class="p">)</span>
+                
+                <span class="c1">#calculate delta dic</span>
+                <span class="n">Delta_DIC_TA_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DIC_TA</span><span class="o">-</span><span class="n">DIC_TA_array</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">Delta_DIC_eq_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DIC_eq</span><span class="o">-</span><span class="n">DIC_eq_array</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">Delta_DIC_theory_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DIC_theory</span><span class="o">-</span><span class="n">DIC_theory_array</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
     
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Cycle&quot;</span><span class="p">:</span><span class="n">cycle_array</span><span class="p">,</span><span class="s2">&quot;State&quot;</span><span class="p">:</span><span class="n">states_array</span><span class="p">,</span><span class="s2">&quot;pH_measured&quot;</span> <span class="p">:</span><span class="n">pH_measured_array</span><span class="p">,</span>
                          <span class="s2">&quot;pH_theory&quot;</span><span class="p">:</span><span class="n">pH_theory_array</span><span class="p">,</span><span class="s2">&quot;TA&quot;</span><span class="p">:</span><span class="n">TA_array</span><span class="p">,</span><span class="s1">&#39;DIC_TA&#39;</span><span class="p">:</span><span class="n">DIC_TA_array</span><span class="p">,</span>
-                         <span class="s2">&quot;DIC_eq&quot;</span><span class="p">:</span><span class="n">DIC_eq_array</span><span class="p">,</span> <span class="s2">&quot;DIC_theory&quot;</span><span class="p">:</span> <span class="n">DIC_theory_array</span><span class="p">,</span><span class="s2">&quot;index&quot;</span><span class="p">:</span><span class="n">index_array</span>
+                         <span class="s2">&quot;DIC_eq&quot;</span><span class="p">:</span><span class="n">DIC_eq_array</span><span class="p">,</span> <span class="s2">&quot;DIC_theory&quot;</span><span class="p">:</span> <span class="n">DIC_theory_array</span><span class="p">,</span><span class="s2">&quot;index&quot;</span><span class="p">:</span><span class="n">index_array</span><span class="p">,</span>
+                         <span class="s2">&quot;Delta_DIC_TA&quot;</span><span class="p">:</span><span class="n">Delta_DIC_TA_array</span><span class="p">,</span><span class="s2">&quot;Delta_DIC_eq&quot;</span><span class="p">:</span><span class="n">Delta_DIC_eq_array</span><span class="p">,</span>
+                         <span class="s2">&quot;Delta_DIC_theory&quot;</span><span class="p">:</span><span class="n">Delta_DIC_theory_array</span>
                         <span class="p">})</span></div>
-
-
 </pre></div>
 
            </div>

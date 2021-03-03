@@ -169,30 +169,44 @@
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">lfilter</span><span class="p">,</span><span class="n">savgol_filter</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fsolve</span><span class="p">,</span><span class="n">root_scalar</span><span class="p">,</span><span class="n">ridder</span><span class="p">,</span><span class="n">anderson</span><span class="p">,</span><span class="n">newton_krylov</span>
 
-<div class="viewcode-block" id="merge_echem_gas_df"><a class="viewcode-back" href="../utils.html#utils.merge_echem_gas_df">[docs]</a><span class="k">def</span> <span class="nf">merge_echem_gas_df</span><span class="p">(</span><span class="n">echem_df</span><span class="p">,</span><span class="n">gas_df</span><span class="p">,</span><span class="n">co2_fit_path</span><span class="o">=</span><span class="s1">&#39;../20210103_right_CO2_sensor_cubic_spline_fit&#39;</span><span class="p">,</span><span class="n">max_loop_num</span><span class="o">=</span><span class="mi">11</span><span class="p">):</span>
+<div class="viewcode-block" id="merge_echem_gas_df"><a class="viewcode-back" href="../utils.html#utils.merge_echem_gas_df">[docs]</a><span class="k">def</span> <span class="nf">merge_echem_gas_df</span><span class="p">(</span><span class="n">echem_df</span><span class="p">,</span><span class="n">gas_df</span><span class="p">,</span><span class="n">co2_fit_path</span><span class="o">=</span><span class="s1">&#39;../20210103_right_CO2_sensor_cubic_spline_fit&#39;</span><span class="p">,</span><span class="n">max_loop_num</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span><span class="n">co2_heat_conductivity</span><span class="o">=</span><span class="mf">0.685</span><span class="p">,</span><span class="n">flow_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Merge **echem_df**, created by `echem_methods.read_echem()` function and **gas_df**, created by `pd.read_csv()&#39; on gas data, on newly created [&#39;Time_Delta&#39;] attribute.</span>
-<span class="sd">        Add [&#39;right_pco2&#39;] attribute to the merged dataset. The [&#39;right_pco2&#39;] attribute is created by using a previously-prepared cubic spline fit that</span>
-<span class="sd">        fits CO2 sensor analog signal to actual CO2 partial pressure. </span>
 
-<span class="sd">        :type echem_df: pd.DataFrame</span>
-<span class="sd">        :param echem_df: A dataset created by `echem_methods.read_echem()` function that contains all electrochemistry data (voltage, current, pH, etc.)</span>
-<span class="sd">        </span>
-<span class="sd">        :type gas_df: pd.DataFrame</span>
-<span class="sd">        :param gas_df: A dataset created by pd.read_csv()&#39; on gas data that contains all gas data (pCO2, flow rate, mass flow controller input, etc.)</span>
+<span class="sd">    Merge **echem_df**, created by `echem_methods.read_echem()` function and **gas_df**, created by `pd.read_csv()` on gas data, on newly created [&#39;Time_Delta&#39;] attribute.</span>
+<span class="sd">    Add [&#39;right_pco2&#39;] attribute to the merged dataset. The [&#39;right_pco2&#39;] attribute is created by using a previously-prepared cubic spline fit that</span>
+<span class="sd">    fits CO2 sensor analog signal to actual CO2 partial pressure. </span>
 
-<span class="sd">        :type co2_fit_path: string</span>
-<span class="sd">        :param co2_fit_path: The path to the cublic spline fit made for fitting CO2 sensor analog input to actual CO2 partial pressure.</span>
+<span class="sd">    :type echem_df: pd.DataFrame</span>
+<span class="sd">    :param echem_df: A dataset created by `echem_methods.read_echem()` function that contains all electrochemistry data (voltage, current, pH, etc.)</span>
+<span class="sd">    </span>
+<span class="sd">    :type gas_df: pd.DataFrame</span>
+<span class="sd">    :param gas_df: A dataset created by pd.read_csv()&#39; on gas data that contains all gas data (pCO2, flow rate, mass flow controller input, etc.)</span>
 
-<span class="sd">        :type max_loop_num: int</span>
-<span class="sd">        :param max_loop_num: Maximum number of loops in Arduino when controlling gas input. Each loop accounts for one change of gas composition.</span>
-<span class="sd">                            e.g. change from 0.1 bar pCO2 to 1 bar is one loop and changing from 1 bar to 0.1 bar is another loop. Usually one battery cycle</span>
-<span class="sd">                            contains two gas-change loops.</span>
+<span class="sd">    :type co2_fit_path: string</span>
+<span class="sd">    :param co2_fit_path: The path to the cublic spline fit made for fitting CO2 sensor analog input to actual CO2 partial pressure.</span>
 
-<span class="sd">        :rtype: *pd.DataFrame*</span>
-<span class="sd">        :return: Merged dataset containing, original **echem_df** and **gas_df** datasets, plus extra [&#39;right_pco2&#39;] attribute.</span>
+<span class="sd">    :type max_loop_num: int</span>
+<span class="sd">    :param max_loop_num: Maximum number of loops in Arduino when controlling gas input. Each loop accounts for one change of gas composition. e.g. change from 0.1 bar pCO2 to 1 bar is one loop and changing from 1 bar to 0.1 bar is another loop. Usually one battery cycle contains two gas-change loops.</span>
+
+<span class="sd">    :type co2_heat_conductivity: float</span>
+<span class="sd">    :param co2_heat_conductivity: Ratio of CO2 heat conductivity over N2 heat conductivity (flow sensor dependent). This value should be obtained through calibrating CO2 sensor and flow sensor. This value may change over time as sensor is corroded by humidity.</span>
+
+<span class="sd">    :type flow_offset: float</span>
+<span class="sd">    :param flow_offset: Offset in sccm. This is the difference between measured flow rate and the flow rate set by mass flow controllers. The offset is likely caused by accumulated problems of flow meter over time.</span>
+
+<span class="sd">    :rtype: *pd.DataFrame*</span>
+<span class="sd">    :return: Merged dataset containing, original **echem_df** and **gas_df** datasets, plus extra [&#39;right_pco2&#39;] attribute.</span>
+<span class="sd">            Below is the list of additional attributes:</span>
+
+<span class="sd">            dataset[&#39;Time_Delta&#39;]-&gt; (*int*): Time difference with respect to the start of the experiment. \n</span>
+<span class="sd">            dataset[&#39;right_pco2&#39;]-&gt; (*float*): CO2 partial pressure in bar. Converted from **CO2 sensor right** by previously determined spline-fit on analog input and CO2 partial pressure</span>
+<span class="sd">            dataset[&#39;Corrected_Flow_Right&#39;] -&gt; (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.</span>
+<span class="sd">            dataset[&#39;Corrected_Flow_Right_filtered&#39;] -&gt; (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. `scipy.lfilter` is used to filtered the signal.</span>
+<span class="sd">            dataset[&#39;CO2Flow]-&gt; (*float*): Product of dataset[&#39;Corrected_Flow_Right&#39;] and dataset[&#39;right_pco2&#39;]. The flow rate of pure CO2.</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="n">echem_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">echem_df</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">days</span><span class="o">*</span><span class="mi">24</span><span class="o">+</span><span class="n">x</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mi">3600</span><span class="p">)</span>
     <span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Time_Delta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">gas_df</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">days</span><span class="o">*</span><span class="mi">24</span><span class="o">+</span><span class="n">x</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mi">3600</span><span class="p">)</span>
 
@@ -210,10 +224,129 @@
     <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span><span class="o">&gt;</span><span class="mf">0.90</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">x</span><span class="p">))</span>
     
     <span class="n">filtered_co2_right</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">])</span>
+    
+    <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;flow sensor right(sccm)&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">co2_heat_conductivity</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">]))</span><span class="o">-</span><span class="n">flow_offset</span>
+    <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right_filtered&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filtered_right</span><span class="o">*</span><span class="p">(</span><span class="n">filtered_co2_right</span><span class="o">*</span><span class="n">co2_heat_conductivity</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">filtered_co2_right</span><span class="p">))</span><span class="o">-</span><span class="n">flow_offset</span>
+    <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;CO2Flow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">]</span>
 
-    <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;flow sensor right(sccm)&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.685</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;right_pco2&#39;</span><span class="p">]))</span>
-    <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Corrected_Flow_Right_filtered&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filtered_right</span><span class="o">*</span><span class="p">(</span><span class="n">filtered_co2_right</span><span class="o">*</span><span class="mf">0.685</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">filtered_co2_right</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">total_df</span></div>
+
+
+
+
+<div class="viewcode-block" id="merge_amount_dic_df"><a class="viewcode-back" href="../utils.html#utils.merge_amount_dic_df">[docs]</a><span class="k">def</span> <span class="nf">merge_amount_dic_df</span><span class="p">(</span><span class="n">dic_df</span><span class="p">,</span><span class="n">amount_df</span><span class="p">,</span><span class="n">volume</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span><span class="n">pco2</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Merge **amount_df** and states 1 and 3 of **dic_df** together so comparing experimental cpatured amount </span>
+<span class="sd">    and theoretical amount is easy.</span>
+
+<span class="sd">    :type dic_df: pd.DataFrame</span>
+<span class="sd">    :param dic_df: A dataset created by `calc_dic.calc_DIC()` function that contains DIC info at different state and different capture or release amount between states.</span>
+
+<span class="sd">    :type amount_df: pd.DataFrame</span>
+<span class="sd">    :param amount_df: A dataset created by `gas_methods.calculate_amount()` function. This dataset contains capture and release amount of CO2 in mL.</span>
+
+<span class="sd">    :type volume: float</span>
+<span class="sd">    :param volume: Volume in litre. Usually is 0.01 or 10 mL</span>
+
+<span class="sd">    :type pco2: float</span>
+<span class="sd">    :param pco2: pCO2 during capture. Used for correcting Delta_DIC_outgas_exp to effective Delta_DIC using an absolute measure (difference in DIC is only from co2aq difference at 1 bar pCO2 and **pco2** bar pCO2). </span>
+
+<span class="sd">    :rtype: *pd.DataFrame*</span>
+<span class="sd">    :return: Merged dataset containing Delta_DIC of different source (experimental, TA, eq and theory,eq) </span>
+<span class="sd">    </span>
+<span class="sd">            dataset[&#39;Delta_DIC_capture_exp&#39;] -&gt; (*float*): Delta DIC measured during capture according to gas flow \n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_outgas_exp&#39;] -&gt; (*float*): Delta DIC measured during outgas according to gas flow \n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_TA_capture&#39;] -&gt; (*float*): Delta DIC measured during capture according to TA and measured pH\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_TA_outgas&#39;] -&gt; (*float*): Delta DIC measured during outgas according to TA and measured pH\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_eq_capture&#39;] -&gt; (*float*): Delta DIC measured during capture according to measured pH and assuming gas solution equilibrium\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_eq_outgas&#39;] -&gt; (*float*): Delta DIC measured during outgas according to measured pH and assuming gas solution equilibrium\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_theory_capture&#39;] -&gt; (*float*): Delta DIC measured during capture according to TA and theoretical pH given TA and assuming gas solution equilibrium\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_theory_outgas&#39;] -&gt; (*float*): Delta DIC measured during outgas according to TA and theoretical pH given TA and assuming gas solution equilibrium\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_TA_effective&#39;] -&gt; (*float*): Effective Delta DIC TA (DIC_TA difference in state 1 and 3)\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_eq_effective&#39;] -&gt; (*float*): Effective Delta DIC eq (DIC_eq difference in state 1 and 3)\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_theory_effective&#39;] -&gt; (*float*): Effective Delta DIC theory (DIC_theory difference in state 1 and 3)\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_exp_TA_effective&#39;] -&gt; (*float*): Effective Delta DIC_exp corrected by dataset[&#39;Delta_DIC_outgas_exp&#39;]*dataset[&#39;Delta_DIC_TA_effective&#39;]/dataset[&#39;Delta_DIC_TA_outgas&#39;] (Assuming two types of measurements give similar results)\n</span>
+<span class="sd">            dataset[&#39;Delta_DIC_exp_abs_effective&#39;] -&gt; (*float*): Effective Delta DIC_exp corrected by dataset[&#39;Delta_DIC_outgas_exp&#39;]-(1-**pco2**)*0.035 (Assume the difference in outgas Delta_DIC_measured and effective Delta_DIC is the difference in co2aq)\n</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">dic_capture_df</span> <span class="o">=</span> <span class="n">dic_df</span><span class="p">[</span><span class="n">dic_df</span><span class="p">[</span><span class="s1">&#39;State&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">([</span><span class="s1">&#39;Cycle&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_TA&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_eq&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_theory&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dic_capture_df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dic_capture_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Delta_DIC_TA&quot;</span><span class="p">:</span><span class="s2">&quot;Delta_DIC_TA_capture&quot;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_eq&#39;</span><span class="p">:</span><span class="s1">&#39;Delta_DIC_eq_capture&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;Delta_DIC_theory&#39;</span><span class="p">:</span><span class="s1">&#39;Delta_DIC_theory_capture&#39;</span><span class="p">}))</span>
+    
+    
+    <span class="n">dic_outgas_df</span> <span class="o">=</span> <span class="n">dic_df</span><span class="p">[</span><span class="n">dic_df</span><span class="p">[</span><span class="s1">&#39;State&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;3&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">([</span><span class="s1">&#39;Cycle&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_TA&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_eq&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_theory&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dic_outgas_df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dic_outgas_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Delta_DIC_TA&quot;</span><span class="p">:</span><span class="s2">&quot;Delta_DIC_TA_outgas&quot;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_eq&#39;</span><span class="p">:</span><span class="s1">&#39;Delta_DIC_eq_outgas&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;Delta_DIC_theory&#39;</span><span class="p">:</span><span class="s1">&#39;Delta_DIC_theory_outgas&#39;</span><span class="p">}))</span>
+    
+    <span class="n">amount_df</span> <span class="o">=</span> <span class="n">amount_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Cycle_Number&#39;</span><span class="p">:</span><span class="s1">&#39;Cycle&#39;</span><span class="p">})</span>
+    <span class="n">amount_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_capture_exp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amount_df</span><span class="p">[</span><span class="s1">&#39;Capture_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="n">volume</span>
+    <span class="n">amount_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_outgas_exp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amount_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="n">volume</span>
+    
+    <span class="n">merged_df</span> <span class="o">=</span> <span class="n">amount_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">dic_capture_df</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="s1">&#39;Cycle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">dic_outgas_df</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="s1">&#39;Cycle&#39;</span><span class="p">)</span>
+        
+    <span class="c1">#correct the effective amount with the difference in DIC between state 1 and 1&#39;</span>
+    <span class="n">dic_1_1prime_diff_df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dic_df</span><span class="p">[</span><span class="n">dic_df</span><span class="p">[</span><span class="s1">&#39;State&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;1</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">([</span><span class="s1">&#39;Cycle&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_TA&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_eq&#39;</span><span class="p">,</span><span class="s1">&#39;Delta_DIC_theory&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_TA_effective&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic_outgas_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_TA_outgas&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">dic_1_1prime_diff_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_TA&#39;</span><span class="p">]</span>
+    <span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_eq_effective&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic_outgas_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_eq_outgas&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">dic_1_1prime_diff_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_eq&#39;</span><span class="p">]</span>
+    <span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_theory_effective&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic_outgas_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_theory_outgas&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">dic_1_1prime_diff_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_theory&#39;</span><span class="p">]</span>
+    <span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_exp_TA_effective&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_outgas_exp&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_TA_effective&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_TA_outgas&#39;</span><span class="p">]</span>
+    <span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_exp_abs_effective&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_outgas_exp&#39;</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">pco2</span><span class="p">)</span><span class="o">*</span><span class="mf">0.035</span>
+
+    <span class="k">return</span> <span class="n">merged_df</span></div>
+
+
+
+
+<div class="viewcode-block" id="merge_echemEnergy_amountDIC_df"><a class="viewcode-back" href="../utils.html#utils.merge_echemEnergy_amountDIC_df">[docs]</a><span class="k">def</span> <span class="nf">merge_echemEnergy_amountDIC_df</span><span class="p">(</span><span class="n">echem_energy_df</span><span class="p">,</span><span class="n">amount_DIC_df</span><span class="p">,</span><span class="n">volume</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+    
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Merge **echem_energy_df** and **amount_DIC_df**, includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively </span>
+<span class="sd">    (Delta_DIC in bewtween states 1 and 3 (now only on outgasd amount)), and includes CO2 captured or released per electron.</span>
+
+
+<span class="sd">    :type echem_energy_df: pd.DataFrame</span>
+<span class="sd">    :param echem_energy_df: A dataset created by `echem_methods.cal_capacity_energy()` function. The dataset contains capacity and energy information.</span>
+
+<span class="sd">    :type amonut_DIC_df: pd.DataFrame</span>
+<span class="sd">    :param amount_DIC_df: A dataset created by `utils.merge_amount_dic_df()` function. The dataset contains Delta DIC calculated using various sources.</span>
+<span class="sd">    </span>
+<span class="sd">    :rtype: *pd.DataFrame*</span>
+<span class="sd">    :return: A merged dataset that includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively (Delta_DIC in bewtween state3 1 and 3), and includes CO2 captured or released per electron.</span>
+
+<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Outgas_amount, </span>
+<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Outgas_amount</span>
+<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Outgas_amount</span>
+<span class="sd">            dataset[&#39;co2_captured/electron&#39;] -&gt; (*float*): mol of CO2 captured over mol of charge capacity</span>
+<span class="sd">            dataset[&#39;co2_outgassed/electron&#39;] -&gt; (*float*): mol of CO2 outgassed over mol of discharge capacity</span>
+
+<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective</span>
+<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective</span>
+<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective</span>
+
+<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective</span>
+<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective</span>
+<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">echem_energy_df</span> <span class="o">=</span> <span class="n">echem_energy_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Cycle_Number&#39;</span><span class="p">:</span><span class="s1">&#39;Cycle&#39;</span><span class="p">})</span>
+    <span class="n">energy_co2_df</span> <span class="o">=</span> <span class="n">echem_energy_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">amount_DIC_df</span><span class="p">,</span><span class="n">on</span><span class="o">=</span><span class="s1">&#39;Cycle&#39;</span><span class="p">)</span>
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Charge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span> 
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;cycle_work(kJ/molCO2)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)&#39;</span><span class="p">]</span>
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;co2_captured/electron&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Capture_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Charge_Capacity&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">96485</span><span class="p">)</span>
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;co2_outgassed/electron&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Outgas_Amount&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">24.01</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Capacity&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">96485</span><span class="p">)</span>
+
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)_exp_TA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Charge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_exp_TA_effective&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">volume</span><span class="p">)</span> 
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)_exp_TA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_exp_TA_effective&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">volume</span><span class="p">)</span>
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;cycle_work(kJ/molCO2)_exp_TA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)_exp_TA&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)_exp_TA&#39;</span><span class="p">]</span>
+
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)_exp_abs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Charge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_exp_abs_effective&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">volume</span><span class="p">)</span> 
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)_exp_abs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Discharge_Energy&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;Delta_DIC_exp_abs_effective&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">volume</span><span class="p">)</span>
+    <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;cycle_work(kJ/molCO2)_exp_abs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;deacidification_work(kJ/molCO2)_exp_abs&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">energy_co2_df</span><span class="p">[</span><span class="s1">&#39;acidification_work(kJ/molCO2)_exp_abs&#39;</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">energy_co2_df</span></div>
 </pre></div>
 
            </div>
