@@ -271,13 +271,13 @@ def cal_capacity_energy(path,cycle_number = 5):
     :rtype: *pd.DataFrame*
     :return: **dataset** a dataset that containts multi-cycle's cycle capacity,energy and efficiencies.
 
-            dataset['Cycle'] -> datetime.datetime: datetime of the current datum point\n
-            dataset['Charge_Capacity'] -> float: charge capacity\n
-            dataset['Charge_Energy'] -> float: charge energy\n
-            dataset['Discharge_Capacity'] -> float: discharge capacity\n
-            dataset['Discharge_Energy'] -> float: discharge energy\n
-            dataset['Coulombic_Efficiency'] -> float: coulombic energy\n
-            dataset['Energy_Efficiency'] -> float: round-trip energy efficiency\n
+            dataset['Cycle'] -> (*datetime.datetime*): datetime of the current datum point\n
+            dataset['Charge_Capacity'] -> (*float*): charge capacity\n
+            dataset['Charge_Energy'] -> (*float*): charge energy\n
+            dataset['Discharge_Capacity'] -> (*float*): discharge capacity\n
+            dataset['Discharge_Energy'] -> (*float*): discharge energy\n
+            dataset['Coulombic_Efficiency'] -> (*float*): coulombic energy\n
+            dataset['Energy_Efficiency'] -> (*float*): round-trip energy efficiency\n
     """
     
     
@@ -329,7 +329,7 @@ def cal_capacity_energy(path,cycle_number = 5):
     return dataset
         
 
-def find_echem_time_period(path,co2=True,outgas_time = 60):
+def find_echem_time_period(path,co2=True,cycle_number=5,outgas_time = 165):
     
     """ 
       Utilizes `find_date_time method`, reads a Gamry folder and returns a dataset containing the start and end time 
@@ -401,7 +401,7 @@ def find_echem_time_period(path,co2=True,outgas_time = 60):
     outgas_start_time_array = []
     outgas_end_time_array = []
     
-    for i in range(1,6):
+    for i in range(1,cycle_number+1):
         cycle_array.append(i)
         with open(srcdir+'PWRCHARGE_#'+str(i)+'.DTA',newline='') as charge_file:
             charge_start_time_array.append(find_date_time(charge_file))
@@ -439,9 +439,9 @@ def find_echem_time_period(path,co2=True,outgas_time = 60):
             if minute >= 60:
                 minute = minute - 60
                 hour = hour + 1
-                if hour >= 24:
-                    hour = hour-24
-                    day = day+1
+            if hour >= 24:
+                hour = hour-24
+                day = day+1
             outgas_end_time = datetime.datetime(year,month,day,hour,minute,second)
             outgas_end_time_array.append(outgas_end_time)
     if co2:
@@ -455,7 +455,7 @@ def find_echem_time_period(path,co2=True,outgas_time = 60):
                             'Discharge_Start_Time':discharge_start_time_array})
     return dataset
 
-def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=107):
+def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=165):
     
     """    
       Combine the results of **read_echem**, **cal_capacity_energy**, 
@@ -526,7 +526,7 @@ def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=107):
 
     #create time df
     #107/120 because the voltage hold period is 107 minute, determined by deducting echem time from 2 hour.
-    time_df = find_echem_time_period(electrochem_path,outgas_time=outgas_time,co2=co2)
+    time_df = find_echem_time_period(electrochem_path,cycle_number=cycle_number,outgas_time=outgas_time,co2=co2)
     #display(time_40_df)
     
     return {"echem_df":echem_df,"energy_df":energy_df,"time_df":time_df}

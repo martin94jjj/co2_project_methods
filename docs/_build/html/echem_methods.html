@@ -270,13 +270,13 @@ puts everything together in a dataset with multi-cycle’s cycle capacity,energy
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><p><strong>dataset</strong> a dataset that containts multi-cycle’s cycle capacity,energy and efficiencies.</p>
-<p>dataset[‘Cycle’] -&gt; datetime.datetime: datetime of the current datum point</p>
-<p>dataset[‘Charge_Capacity’] -&gt; float: charge capacity</p>
-<p>dataset[‘Charge_Energy’] -&gt; float: charge energy</p>
-<p>dataset[‘Discharge_Capacity’] -&gt; float: discharge capacity</p>
-<p>dataset[‘Discharge_Energy’] -&gt; float: discharge energy</p>
-<p>dataset[‘Coulombic_Efficiency’] -&gt; float: coulombic energy</p>
-<p>dataset[‘Energy_Efficiency’] -&gt; float: round-trip energy efficiency</p>
+<p>dataset[‘Cycle’] -&gt; (<em>datetime.datetime</em>): datetime of the current datum point</p>
+<p>dataset[‘Charge_Capacity’] -&gt; (<em>float</em>): charge capacity</p>
+<p>dataset[‘Charge_Energy’] -&gt; (<em>float</em>): charge energy</p>
+<p>dataset[‘Discharge_Capacity’] -&gt; (<em>float</em>): discharge capacity</p>
+<p>dataset[‘Discharge_Energy’] -&gt; (<em>float</em>): discharge energy</p>
+<p>dataset[‘Coulombic_Efficiency’] -&gt; (<em>float</em>): coulombic energy</p>
+<p>dataset[‘Energy_Efficiency’] -&gt; (<em>float</em>): round-trip energy efficiency</p>
 </p>
 </dd>
 </dl>
@@ -284,7 +284,7 @@ puts everything together in a dataset with multi-cycle’s cycle capacity,energy
 
 <dl class="py function">
 <dt id="echem_methods.create_echem_dfs">
-<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">create_echem_dfs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">107</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#create_echem_dfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.create_echem_dfs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">create_echem_dfs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">165</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#create_echem_dfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.create_echem_dfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine the results of <strong>read_echem</strong>, <strong>cal_capacity_energy</strong>,
 and <strong>find_echem_time_period</strong> to produce a dictionary of the three dfs.</p>
 <blockquote>
@@ -356,7 +356,7 @@ and <strong>find_echem_time_period</strong> to produce a dictionary of the three
 
 <dl class="py function">
 <dt id="echem_methods.find_echem_time_period">
-<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">find_echem_time_period</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#find_echem_time_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.find_echem_time_period" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">find_echem_time_period</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">165</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#find_echem_time_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.find_echem_time_period" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utilizes <cite>find_date_time method</cite>, reads a Gamry folder and returns a dataset containing the start and end time
 of deacidification, capture, acidification and outgas.</p>
 <blockquote>

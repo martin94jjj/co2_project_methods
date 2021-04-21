@@ -428,13 +428,13 @@
 <span class="sd">    :rtype: *pd.DataFrame*</span>
 <span class="sd">    :return: **dataset** a dataset that containts multi-cycle&#39;s cycle capacity,energy and efficiencies.</span>
 
-<span class="sd">            dataset[&#39;Cycle&#39;] -&gt; datetime.datetime: datetime of the current datum point\n</span>
-<span class="sd">            dataset[&#39;Charge_Capacity&#39;] -&gt; float: charge capacity\n</span>
-<span class="sd">            dataset[&#39;Charge_Energy&#39;] -&gt; float: charge energy\n</span>
-<span class="sd">            dataset[&#39;Discharge_Capacity&#39;] -&gt; float: discharge capacity\n</span>
-<span class="sd">            dataset[&#39;Discharge_Energy&#39;] -&gt; float: discharge energy\n</span>
-<span class="sd">            dataset[&#39;Coulombic_Efficiency&#39;] -&gt; float: coulombic energy\n</span>
-<span class="sd">            dataset[&#39;Energy_Efficiency&#39;] -&gt; float: round-trip energy efficiency\n</span>
+<span class="sd">            dataset[&#39;Cycle&#39;] -&gt; (*datetime.datetime*): datetime of the current datum point\n</span>
+<span class="sd">            dataset[&#39;Charge_Capacity&#39;] -&gt; (*float*): charge capacity\n</span>
+<span class="sd">            dataset[&#39;Charge_Energy&#39;] -&gt; (*float*): charge energy\n</span>
+<span class="sd">            dataset[&#39;Discharge_Capacity&#39;] -&gt; (*float*): discharge capacity\n</span>
+<span class="sd">            dataset[&#39;Discharge_Energy&#39;] -&gt; (*float*): discharge energy\n</span>
+<span class="sd">            dataset[&#39;Coulombic_Efficiency&#39;] -&gt; (*float*): coulombic energy\n</span>
+<span class="sd">            dataset[&#39;Energy_Efficiency&#39;] -&gt; (*float*): round-trip energy efficiency\n</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     
@@ -486,7 +486,7 @@
     <span class="k">return</span> <span class="n">dataset</span></div>
         
 
-<div class="viewcode-block" id="find_echem_time_period"><a class="viewcode-back" href="../echem_methods.html#echem_methods.find_echem_time_period">[docs]</a><span class="k">def</span> <span class="nf">find_echem_time_period</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">outgas_time</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<div class="viewcode-block" id="find_echem_time_period"><a class="viewcode-back" href="../echem_methods.html#echem_methods.find_echem_time_period">[docs]</a><span class="k">def</span> <span class="nf">find_echem_time_period</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">outgas_time</span> <span class="o">=</span> <span class="mi">165</span><span class="p">):</span>
     
     <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">      Utilizes `find_date_time method`, reads a Gamry folder and returns a dataset containing the start and end time </span>
@@ -558,7 +558,7 @@
     <span class="n">outgas_start_time_array</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">outgas_end_time_array</span> <span class="o">=</span> <span class="p">[]</span>
     
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">cycle_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">charge_file</span><span class="p">:</span>
             <span class="n">charge_start_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">find_date_time</span><span class="p">(</span><span class="n">charge_file</span><span class="p">))</span>
@@ -596,9 +596,9 @@
             <span class="k">if</span> <span class="n">minute</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">:</span>
                 <span class="n">minute</span> <span class="o">=</span> <span class="n">minute</span> <span class="o">-</span> <span class="mi">60</span>
                 <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span> <span class="o">+</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">hour</span> <span class="o">&gt;=</span> <span class="mi">24</span><span class="p">:</span>
-                    <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span><span class="o">-</span><span class="mi">24</span>
-                    <span class="n">day</span> <span class="o">=</span> <span class="n">day</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">hour</span> <span class="o">&gt;=</span> <span class="mi">24</span><span class="p">:</span>
+                <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span><span class="o">-</span><span class="mi">24</span>
+                <span class="n">day</span> <span class="o">=</span> <span class="n">day</span><span class="o">+</span><span class="mi">1</span>
             <span class="n">outgas_end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">month</span><span class="p">,</span><span class="n">day</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minute</span><span class="p">,</span><span class="n">second</span><span class="p">)</span>
             <span class="n">outgas_end_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outgas_end_time</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">co2</span><span class="p">:</span>
@@ -612,7 +612,7 @@
                             <span class="s1">&#39;Discharge_Start_Time&#39;</span><span class="p">:</span><span class="n">discharge_start_time_array</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">dataset</span></div>
 
-<div class="viewcode-block" id="create_echem_dfs"><a class="viewcode-back" href="../echem_methods.html#echem_methods.create_echem_dfs">[docs]</a><span class="k">def</span> <span class="nf">create_echem_dfs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">outgas_time</span><span class="o">=</span><span class="mi">107</span><span class="p">):</span>
+<div class="viewcode-block" id="create_echem_dfs"><a class="viewcode-back" href="../echem_methods.html#echem_methods.create_echem_dfs">[docs]</a><span class="k">def</span> <span class="nf">create_echem_dfs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">outgas_time</span><span class="o">=</span><span class="mi">165</span><span class="p">):</span>
     
     <span class="sd">&quot;&quot;&quot;    </span>
 <span class="sd">      Combine the results of **read_echem**, **cal_capacity_energy**, </span>
@@ -683,7 +683,7 @@
 
     <span class="c1">#create time df</span>
     <span class="c1">#107/120 because the voltage hold period is 107 minute, determined by deducting echem time from 2 hour.</span>
-    <span class="n">time_df</span> <span class="o">=</span> <span class="n">find_echem_time_period</span><span class="p">(</span><span class="n">electrochem_path</span><span class="p">,</span><span class="n">outgas_time</span><span class="o">=</span><span class="n">outgas_time</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="n">co2</span><span class="p">)</span>
+    <span class="n">time_df</span> <span class="o">=</span> <span class="n">find_echem_time_period</span><span class="p">(</span><span class="n">electrochem_path</span><span class="p">,</span><span class="n">cycle_number</span><span class="o">=</span><span class="n">cycle_number</span><span class="p">,</span><span class="n">outgas_time</span><span class="o">=</span><span class="n">outgas_time</span><span class="p">,</span><span class="n">co2</span><span class="o">=</span><span class="n">co2</span><span class="p">)</span>
     <span class="c1">#display(time_40_df)</span>
     
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;echem_df&quot;</span><span class="p">:</span><span class="n">echem_df</span><span class="p">,</span><span class="s2">&quot;energy_df&quot;</span><span class="p">:</span><span class="n">energy_df</span><span class="p">,</span><span class="s2">&quot;time_df&quot;</span><span class="p">:</span><span class="n">time_df</span><span class="p">}</span></div>

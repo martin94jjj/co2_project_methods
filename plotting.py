@@ -64,7 +64,7 @@ def plot_baseline(amount_df,total_df,cycle=2,capture=True,baseline_range=100,cap
 
 
 
-def plot_baseline_selection(total_df,capture=True,cycle=5,time_change_period=10800,start=3500,end=6500,vertical_offset=10,ymin=0,ymax=60,title="Capture Baseline Selection"):
+def plot_baseline_selection(total_df,capture=True,cycle=5,time_change_period=10800,start=3500,end=6500,parameter= "Corrected_Flow_Right",vertical_offset=10,ymin=0,ymax=60,title="Capture Baseline Selection"):
     
     """
     Stack different cycles' capture or release period with a vertical offset value. Used for manual baseline selection
@@ -107,10 +107,10 @@ def plot_baseline_selection(total_df,capture=True,cycle=5,time_change_period=108
     fig, ax = plt.subplots(1,1,figsize=(5.941,4.630),dpi=400)
     if capture:
         for i in range(1,cycle+1):
-            ax.plot(total_df.index.values[(i-1)*2*time_change_period:(2*i-1)*time_change_period]-time_change_period*2*(i-1),vertical_offset*(i-1)+total_df['Corrected_Flow_Right'].iloc[(i-1)*2*time_change_period:(2*i-1)*time_change_period])
+            ax.plot(total_df.index.values[(i-1)*2*time_change_period:(2*i-1)*time_change_period]-time_change_period*2*(i-1),vertical_offset*(i-1)+total_df[parameter].iloc[(i-1)*2*time_change_period:(2*i-1)*time_change_period])
     else:
         for i in range(0,cycle):
-            ax.plot(total_df.index.values[(2*i+1)*time_change_period:(2*i+2)*time_change_period]-time_change_period*(2*i+1),vertical_offset*(i)+total_df['Corrected_Flow_Right'].iloc[(2*i+1)*time_change_period:(2*i+2)*time_change_period])
+            ax.plot(total_df.index.values[(2*i+1)*time_change_period:(2*i+2)*time_change_period]-time_change_period*(2*i+1),vertical_offset*(i)+total_df[parameter].iloc[(2*i+1)*time_change_period:(2*i+2)*time_change_period])
 
     ax.vlines(start,ymin=ymin,ymax=ymax,color='black')
     ax.vlines(end,ymin=ymin,ymax=ymax,color='black')
