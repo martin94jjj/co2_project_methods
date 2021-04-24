@@ -43,10 +43,10 @@ def merge_echem_gas_df(echem_df,gas_df,co2_fit_path='../20210103_right_CO2_senso
             Below is the list of additional attributes:
 
             dataset['Time_Delta']-> (*int*): Time difference with respect to the start of the experiment. \n
-            dataset['right_pco2']-> (*float*): CO2 partial pressure in bar. Converted from **CO2 sensor right** by previously determined spline-fit on analog input and CO2 partial pressure
-            dataset['Corrected_Flow_Right'] -> (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.
-            dataset['Corrected_Flow_Right_filtered'] -> (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. `scipy.lfilter` is used to filtered the signal.
-            dataset['CO2Flow]-> (*float*): Product of dataset['Corrected_Flow_Right'] and dataset['right_pco2']. The flow rate of pure CO2.
+            dataset['right_pco2']-> (*float*): CO2 partial pressure in bar. Converted from **CO2 sensor right** by previously determined spline-fit on analog input and CO2 partial pressure. \n
+            dataset['Corrected_Flow_Right'] -> (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.\n
+            dataset['Corrected_Flow_Right_filtered'] -> (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. `scipy.lfilter` is used to filtered the signal.\n
+            dataset['CO2Flow]-> (*float*): Product of dataset['Corrected_Flow_Right'] and dataset['right_pco2']. The flow rate of pure CO2.\n
 
     '''
 
@@ -158,19 +158,19 @@ def merge_echemEnergy_amountDIC_df(echem_energy_df,amount_DIC_df,volume=0.01):
     :rtype: *pd.DataFrame*
     :return: A merged dataset that includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively (Delta_DIC in bewtween state3 1 and 3), and includes CO2 captured or released per electron.
 
-            dataset['deacidification_work(kJ/molCO2)'] -> (*float*): deacidification work (kJ/molCO2), over Outgas_amount, 
-            dataset['acidification_work(kJ/molCO2)'] -> (*float*): acidification work (kJ/molCO2), over Outgas_amount
-            dataset['cycle_work(kJ/molCO2)'] -> (*float*): cycle work (kJ/molCO2), over Outgas_amount
-            dataset['co2_captured/electron'] -> (*float*): mol of CO2 captured over mol of charge capacity
-            dataset['co2_outgassed/electron'] -> (*float*): mol of CO2 outgassed over mol of discharge capacity
+            dataset['deacidification_work(kJ/molCO2)'] -> (*float*): deacidification work (kJ/molCO2), over Outgas_amount, \n
+            dataset['acidification_work(kJ/molCO2)'] -> (*float*): acidification work (kJ/molCO2), over Outgas_amount\n
+            dataset['cycle_work(kJ/molCO2)'] -> (*float*): cycle work (kJ/molCO2), over Outgas_amount\n
+            dataset['co2_captured/electron'] -> (*float*): mol of CO2 captured over mol of charge capacity\n
+            dataset['co2_outgassed/electron'] -> (*float*): mol of CO2 outgassed over mol of discharge capacity\n
 
-            dataset['deacidification_work(kJ/molCO2)_exp_TA'] -> (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective
-            dataset['acidification_work(kJ/molCO2)_exp_TA'] -> (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective
-            dataset['cycle_work(kJ/molCO2)_exp_TA'] -> (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective
+            dataset['deacidification_work(kJ/molCO2)_exp_TA'] -> (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective\n
+            dataset['acidification_work(kJ/molCO2)_exp_TA'] -> (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective\n
+            dataset['cycle_work(kJ/molCO2)_exp_TA'] -> (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective\n
 
-            dataset['deacidification_work(kJ/molCO2)_exp_abs'] -> (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective
-            dataset['acidification_work(kJ/molCO2)_exp_abs'] -> (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective
-            dataset['cycle_work(kJ/molCO2)_exp_abs'] -> (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective
+            dataset['deacidification_work(kJ/molCO2)_exp_abs'] -> (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective\n
+            dataset['acidification_work(kJ/molCO2)_exp_abs'] -> (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective\n
+            dataset['cycle_work(kJ/molCO2)_exp_abs'] -> (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective\n
     '''
 
     echem_energy_df = echem_energy_df.rename(columns={'Cycle_Number':'Cycle'})
