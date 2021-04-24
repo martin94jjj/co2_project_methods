@@ -200,10 +200,10 @@
 <span class="sd">            Below is the list of additional attributes:</span>
 
 <span class="sd">            dataset[&#39;Time_Delta&#39;]-&gt; (*int*): Time difference with respect to the start of the experiment. \n</span>
-<span class="sd">            dataset[&#39;right_pco2&#39;]-&gt; (*float*): CO2 partial pressure in bar. Converted from **CO2 sensor right** by previously determined spline-fit on analog input and CO2 partial pressure</span>
-<span class="sd">            dataset[&#39;Corrected_Flow_Right&#39;] -&gt; (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.</span>
-<span class="sd">            dataset[&#39;Corrected_Flow_Right_filtered&#39;] -&gt; (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. `scipy.lfilter` is used to filtered the signal.</span>
-<span class="sd">            dataset[&#39;CO2Flow]-&gt; (*float*): Product of dataset[&#39;Corrected_Flow_Right&#39;] and dataset[&#39;right_pco2&#39;]. The flow rate of pure CO2.</span>
+<span class="sd">            dataset[&#39;right_pco2&#39;]-&gt; (*float*): CO2 partial pressure in bar. Converted from **CO2 sensor right** by previously determined spline-fit on analog input and CO2 partial pressure. \n</span>
+<span class="sd">            dataset[&#39;Corrected_Flow_Right&#39;] -&gt; (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.\n</span>
+<span class="sd">            dataset[&#39;Corrected_Flow_Right_filtered&#39;] -&gt; (*float*): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. `scipy.lfilter` is used to filtered the signal.\n</span>
+<span class="sd">            dataset[&#39;CO2Flow]-&gt; (*float*): Product of dataset[&#39;Corrected_Flow_Right&#39;] and dataset[&#39;right_pco2&#39;]. The flow rate of pure CO2.\n</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -315,19 +315,19 @@
 <span class="sd">    :rtype: *pd.DataFrame*</span>
 <span class="sd">    :return: A merged dataset that includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively (Delta_DIC in bewtween state3 1 and 3), and includes CO2 captured or released per electron.</span>
 
-<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Outgas_amount, </span>
-<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Outgas_amount</span>
-<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Outgas_amount</span>
-<span class="sd">            dataset[&#39;co2_captured/electron&#39;] -&gt; (*float*): mol of CO2 captured over mol of charge capacity</span>
-<span class="sd">            dataset[&#39;co2_outgassed/electron&#39;] -&gt; (*float*): mol of CO2 outgassed over mol of discharge capacity</span>
+<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Outgas_amount, \n</span>
+<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Outgas_amount\n</span>
+<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Outgas_amount\n</span>
+<span class="sd">            dataset[&#39;co2_captured/electron&#39;] -&gt; (*float*): mol of CO2 captured over mol of charge capacity\n</span>
+<span class="sd">            dataset[&#39;co2_outgassed/electron&#39;] -&gt; (*float*): mol of CO2 outgassed over mol of discharge capacity\n</span>
 
-<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective</span>
-<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective</span>
-<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective</span>
+<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective\n</span>
+<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective\n</span>
+<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)_exp_TA&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective\n</span>
 
-<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective</span>
-<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective</span>
-<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective</span>
+<span class="sd">            dataset[&#39;deacidification_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective\n</span>
+<span class="sd">            dataset[&#39;acidification_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective\n</span>
+<span class="sd">            dataset[&#39;cycle_work(kJ/molCO2)_exp_abs&#39;] -&gt; (*float*): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective\n</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">echem_energy_df</span> <span class="o">=</span> <span class="n">echem_energy_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Cycle_Number&#39;</span><span class="p">:</span><span class="s1">&#39;Cycle&#39;</span><span class="p">})</span>

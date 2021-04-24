@@ -247,17 +247,17 @@ and theoretical amount is easy.</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><p>A merged dataset that includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively (Delta_DIC in bewtween state3 1 and 3), and includes CO2 captured or released per electron.</p>
-<p>dataset[‘deacidification_work(kJ/molCO2)’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Outgas_amount,
-dataset[‘acidification_work(kJ/molCO2)’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Outgas_amount
-dataset[‘cycle_work(kJ/molCO2)’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Outgas_amount
-dataset[‘co2_captured/electron’] -&gt; (<em>float</em>): mol of CO2 captured over mol of charge capacity
-dataset[‘co2_outgassed/electron’] -&gt; (<em>float</em>): mol of CO2 outgassed over mol of discharge capacity</p>
-<p>dataset[‘deacidification_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective
-dataset[‘acidification_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective
-dataset[‘cycle_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective</p>
-<p>dataset[‘deacidification_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective
-dataset[‘acidification_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective
-dataset[‘cycle_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective</p>
+<p>dataset[‘deacidification_work(kJ/molCO2)’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Outgas_amount,</p>
+<p>dataset[‘acidification_work(kJ/molCO2)’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Outgas_amount</p>
+<p>dataset[‘cycle_work(kJ/molCO2)’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Outgas_amount</p>
+<p>dataset[‘co2_captured/electron’] -&gt; (<em>float</em>): mol of CO2 captured over mol of charge capacity</p>
+<p>dataset[‘co2_outgassed/electron’] -&gt; (<em>float</em>): mol of CO2 outgassed over mol of discharge capacity</p>
+<p>dataset[‘deacidification_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective</p>
+<p>dataset[‘acidification_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Delta_DIC_exp_TA_effective</p>
+<p>dataset[‘cycle_work(kJ/molCO2)_exp_TA’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Delta_DIC_exp_TA_effective</p>
+<p>dataset[‘deacidification_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): deacidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective</p>
+<p>dataset[‘acidification_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): acidification work (kJ/molCO2), over Delta_DIC_exp_abs_effective</p>
+<p>dataset[‘cycle_work(kJ/molCO2)_exp_abs’] -&gt; (<em>float</em>): cycle work (kJ/molCO2), over Delta_DIC_exp_abs_effective</p>
 </p>
 </dd>
 </dl>
@@ -287,10 +287,10 @@ fits CO2 sensor analog signal to actual CO2 partial pressure.</p>
 <dd class="field-odd"><p><p>Merged dataset containing, original <strong>echem_df</strong> and <strong>gas_df</strong> datasets, plus extra [‘right_pco2’] attribute.
 Below is the list of additional attributes:</p>
 <p>dataset[‘Time_Delta’]-&gt; (<em>int</em>): Time difference with respect to the start of the experiment.</p>
-<p>dataset[‘right_pco2’]-&gt; (<em>float</em>): CO2 partial pressure in bar. Converted from <strong>CO2 sensor right</strong> by previously determined spline-fit on analog input and CO2 partial pressure
-dataset[‘Corrected_Flow_Right’] -&gt; (<em>float</em>): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.
-dataset[‘Corrected_Flow_Right_filtered’] -&gt; (<em>float</em>): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. <cite>scipy.lfilter</cite> is used to filtered the signal.
-dataset[‘CO2Flow]-&gt; (<em>float</em>): Product of dataset[‘Corrected_Flow_Right’] and dataset[‘right_pco2’]. The flow rate of pure CO2.</p>
+<p>dataset[‘right_pco2’]-&gt; (<em>float</em>): CO2 partial pressure in bar. Converted from <strong>CO2 sensor right</strong> by previously determined spline-fit on analog input and CO2 partial pressure.</p>
+<p>dataset[‘Corrected_Flow_Right’] -&gt; (<em>float</em>): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value.</p>
+<p>dataset[‘Corrected_Flow_Right_filtered’] -&gt; (<em>float</em>): Actual flow rate corrected from nominal flow rate and CO2 conductivity and offset value. <cite>scipy.lfilter</cite> is used to filtered the signal.</p>
+<p>dataset[‘CO2Flow]-&gt; (<em>float</em>): Product of dataset[‘Corrected_Flow_Right’] and dataset[‘right_pco2’]. The flow rate of pure CO2.</p>
 </p>
 </dd>
 </dl>
