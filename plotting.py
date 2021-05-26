@@ -135,3 +135,84 @@ def plot_baseline_selection(total_df,capture=True,cycle=5,time_change_period=108
 
     plt.minorticks_on()
     plt.show()
+
+
+def plot_theoretical_dic_pH_TA(data_dict,x='TA',y='DIC',legend=True):
+    """
+    Plot relationship among TA, DIC and pH. Can change x and y freely depending on the content to be plotted.
+
+    :type x: string
+    :param x: The array used for x-axis. Choose from "TA","DIC" and "pH"
+
+    :type y: string
+    :param y: The array used for y-axis. Choose from "TA", "DIC" and "pH"
+
+    :type legend: bool
+    :param legend: *True* if you want to show the legend
+
+    :rtype: None
+    :return: Plot an image of DIC vs. pH (or other combinations of DIC, pH and TA) 
+    """
+    fig,ax=plt.subplots(1,1,figsize=(5.941,4.630),dpi=400)
+    
+    if x=='TA' or x =='ta':
+        deacidification_x = data_dict['alkalinity']
+        acidification_x = data_dict['alkalinity']
+        low_to_high_x = [data_dict["alkalinity"][-1]]*len(data_dict["dic_low_to_high"])
+        high_to_low_x = [data_dict["alkalinity"][-0]]*len(data_dict["dic_high_to_low"])
+        xlabel='TA(M)'
+    elif x=="DIC" or x == "dic":
+        deacidification_x = data_dict["dic_deacidification"]
+        acidification_x = data_dict['dic_acidification']
+        low_to_high_x = data_dict["dic_low_to_high"]
+        high_to_low_x = data_dict["dic_high_to_low"]
+        xlabel='DIC(M)'
+        
+    elif x=="pH" or x == "ph":
+        deacidification_x = data_dict["pH_deacidification"]
+        acidification_x = data_dict['pH_acidification']
+        low_to_high_x = data_dict["pH_low_to_high"]
+        high_to_low_x = data_dict["pH_high_to_low"]
+        xlabel ='pH'
+        
+    if y=='TA' or y =='ta':
+        deacidification_y = data_dict['alkalinity']
+        acidification_y = data_dict['alkalinity']
+        low_to_high_y = [data_dict["alkalinity"][-1]]*len(data_dict["dic_low_to_high"])
+        high_to_low_y = [data_dict["alkalinity"][-0]]*len(data_dict["dic_high_to_low"])
+        ylabel = 'TA(M)'
+    elif y=="DIC" or y == "dic":
+        deacidification_y = data_dict["dic_deacidification"]
+        acidification_y = data_dict['dic_acidification']
+        low_to_high_y = data_dict["dic_low_to_high"]
+        high_to_low_y = data_dict["dic_high_to_low"]
+        ylabel = 'DIC(M)'
+    elif y=="pH" or y == "ph":
+        deacidification_y = data_dict["pH_deacidification"]
+        acidification_y = data_dict['pH_acidification']
+        low_to_high_y = data_dict["pH_low_to_high"]
+        high_to_low_y = data_dict["pH_high_to_low"]
+        ylabel = 'pH'
+    
+    low = data_dict['capture_pco2'] 
+    high = data_dict['outgas_pco2']
+    ax.plot(deacidification_x,deacidification_y,label='deacidification/CO$_2$ invasion',lw=2,color='#1f78b4')
+    ax.plot(low_to_high_x,low_to_high_y,lw=2,label='{} to {} bar $p$CO$_2$'.format(low,high),color='#a6cee3')
+    ax.plot(acidification_x,acidification_y,label='acidification/CO$_2$ outgassing',lw=2,color='#33a02c')
+    ax.plot(high_to_low_x,high_to_low_y,label='{} to {} bar $p$CO$_2$'.format(high,low),lw=2,color='#b2df8a')
+    
+    if legend:
+        ax.legend(frameon=False)
+    ax.tick_params(axis='y',which='minor',right=True,direction='in',length=3)
+    ax.tick_params(axis='y',which='major',right=True,direction='in',length=5.5)
+    ax.set_ylabel(ylabel)
+    ax.tick_params(axis='x',which='minor',direction='in',bottom=True,length=3)
+    ax.tick_params(axis='x',which='major',direction='in',bottom=True,length=5.5)
+    ax.set_xlabel(xlabel)
+    #ax.set_title("DIC vs. pH for Capture @ 0.1 bar pCO2 2M ΔTA")
+
+    #ax.set_ylim(-0.3,2.2)
+    #ax.set_xlim(3,10.1)
+    plt.minorticks_on()
+    plt.show()
+

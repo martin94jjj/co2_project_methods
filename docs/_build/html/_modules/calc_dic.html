@@ -286,10 +286,10 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\, given the echem_gas_dataframe(**total_df**)</span>
 <span class="sd">    , **echem_time_df**, which tells the start and end of each echem process, **gas_change_time_df**, which tells when atmosphere CO2 is changed, and the</span>
-<span class="sd">    **volume** of the electrolyte in L.\\</span>
+<span class="sd">    **volume** of the electrolyte in L.</span>
 
 <span class="sd">    Values in State 3&#39;i are calculaed based on initially measured pH (pH measured at state 3&#39;i), pCO2, and assuming gas-solution equilibrium (co2aq=pCO2*0.035(Henry&#39;s constant))</span>
-<span class="sd">    Other states&#39; values are calculated given TA, and using other functions in this module.\\</span>
+<span class="sd">    Other states&#39; values are calculated given TA, and using other functions in this module.</span>
 
 <span class="sd">    **outgas_shift** is necessary when the timing data in **gas_change_df** and **echem_time_df** are off by some time (usually within 30 seconds).</span>
 
@@ -438,6 +438,119 @@
                          <span class="s2">&quot;Delta_DIC_TA&quot;</span><span class="p">:</span><span class="n">Delta_DIC_TA_array</span><span class="p">,</span><span class="s2">&quot;Delta_DIC_eq&quot;</span><span class="p">:</span><span class="n">Delta_DIC_eq_array</span><span class="p">,</span>
                          <span class="s2">&quot;Delta_DIC_theory&quot;</span><span class="p">:</span><span class="n">Delta_DIC_theory_array</span>
                         <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="create_theoretical_dic_pH_array"><a class="viewcode-back" href="../calc_dic.html#calc_dic.create_theoretical_dic_pH_array">[docs]</a><span class="k">def</span> <span class="nf">create_theoretical_dic_pH_array</span><span class="p">(</span><span class="n">min_TA</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="n">max_TA</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span><span class="n">TA_points</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">capture_pco2</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span><span class="n">outgas_pco2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                                    <span class="n">pco2_points</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">deacidification_pH_guess</span> <span class="o">=</span> <span class="mf">7.5</span><span class="p">,</span>
+                                    <span class="n">acidification_pH_guess</span> <span class="o">=</span> <span class="mf">7.5</span><span class="p">,</span><span class="n">pH_low_to_high_guess</span><span class="o">=</span><span class="mf">7.5</span><span class="p">,</span>
+                                   <span class="n">pH_high_to_low_guess</span><span class="o">=</span><span class="mf">7.5</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create theoretical DIC and pH arrays given a max and min total alkalinity</span>
+<span class="sd">    , capture and outgas co2 partial pressure. Useful for plotting the thermodynamics of DIC cycle.</span>
+
+<span class="sd">    :type min_TA: float</span>
+<span class="sd">    :param min_TA: Minimum total alkalinity or alkalinity in the discharged form</span>
+
+<span class="sd">    :type max_TA: float</span>
+<span class="sd">    :param max_TA: Maximum total alkalinity or alkalinity in the charged form</span>
+
+<span class="sd">    :type TA_points: int</span>
+<span class="sd">    :param TA_points: Number of points in the TA array. Used in np.linspace</span>
+
+<span class="sd">    :type capture_pco2: float</span>
+<span class="sd">    :param capture_pco2: CO2 partial pressure in bar during capture process</span>
+
+<span class="sd">    :type outgas_pco2: float</span>
+<span class="sd">    :param outgas_pco2: CO2 partial pressure in bar during outgas process</span>
+
+<span class="sd">    :type pco2_points: int</span>
+<span class="sd">    :param pco2_points: Number of points in the CO2 gas change array. Used in np.linspace</span>
+
+<span class="sd">    :type deacidification_pH_guess: float</span>
+<span class="sd">    :param deacidification_pH_guess: MUST BE A FLOAT. Initial guess of pH in deacidification for scipy.fsolve.</span>
+
+<span class="sd">    :type acidification_pH_guess: float</span>
+<span class="sd">    :param acidification_pH_guess: MUST BE A FLOAT. Initial guess of pH in acidification for scipy.fsolve.</span>
+
+<span class="sd">    :type pH_low_to_high_guess: float </span>
+<span class="sd">    :param pH_low_to_high_guess: MUST BE A FLOAT. Initial guess of pH in gas change fomr low partial pressure to high partial pressure</span>
+<span class="sd">                                 for scipy.fsolve.</span>
+
+<span class="sd">    :type pH_high_to_low_guess: float</span>
+<span class="sd">    :param pH_high_to_low_guess: MUST BE A FLOAT. Initial guess of pH in gas change fomr high partial pressure to low partial pressure</span>
+<span class="sd">                                 for scipy.fsolve.</span>
+
+<span class="sd">    :rtype: *dict*</span>
+<span class="sd">    :return: a dictionary containing TA, DIC, pH array for various processes:</span>
+
+<span class="sd">        dict[&#39;alkalinity&#39;] -&gt; (*list*): alkalinity array, e.g. 100 points between 0 and 0.2 M\n</span>
+<span class="sd">        dict[&#39;change_gas&#39;] -&gt; (*list*): gas_change array, e.g. 100 points between 0.1 and 1 bar\n</span>
+<span class="sd">        dict[&#39;pH_deacidification&#39;] -&gt; (*list*): pH array corresponding to TA and partial pressure in the deacidification process\n</span>
+<span class="sd">        dict[&#39;pH_acidification&#39;] -&gt; (*list*): pH array corresponding to TA and partial pressure in the acidification process\n</span>
+<span class="sd">        dict[&#39;dic_deacidification&#39;] -&gt; (*list*): DIC array corresponding to TA and partial pressure in the deacidification process\n</span>
+<span class="sd">        dict[&#39;dic_acidification&#39;] -&gt; (*list*): DIC array corresponding to TA and partial pressure in the acidification process\n</span>
+<span class="sd">        dict[&#39;pH_low_to_high&#39;] -&gt; (*list*): pH array corresponding to TA and partial pressure in the low to high gas change process\n</span>
+<span class="sd">        dict[&#39;pH_high_to_low&#39;] -&gt; (*list*): pH array corresponding to TA and partial pressure in the high to low gas change process\n</span>
+<span class="sd">        dict[&#39;dic_low_to_high&#39;] -&gt; (*list*): DIC array corresponding to TA and partial pressure in the low to high gas change process\n</span>
+<span class="sd">        dict[&#39;dic_high_to_low&#39;] -&gt; (*list*): DIC array corresponding to TA and partial pressure in the high to low gas change process\n</span>
+<span class="sd">        dict[&#39;capture_pco2&#39;] -&gt; (*float*): capture pCO2 as in the input\n</span>
+<span class="sd">        dict[&#39;outgas_pco2&#39;] -&gt; (*float*): outgas pCO2 as in the input\n</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">alkalinity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_TA</span><span class="p">,</span><span class="n">max_TA</span><span class="p">,</span><span class="n">TA_points</span><span class="p">)</span>
+    <span class="n">co2aq100p</span> <span class="o">=</span> <span class="mf">0.035</span>
+    <span class="n">co2aq_outgas</span> <span class="o">=</span> <span class="n">co2aq100p</span><span class="o">*</span><span class="n">outgas_pco2</span>
+    <span class="n">co2aq_capture</span> <span class="o">=</span> <span class="n">co2aq100p</span><span class="o">*</span><span class="n">capture_pco2</span>
+    <span class="n">pH_deacidification_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pH_acidification_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dic_deacidification_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dic_acidification_array</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">change_gas_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">co2aq_capture</span><span class="p">,</span><span class="n">co2aq_outgas</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="n">pH_low_to_high_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pH_high_to_low_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dic_low_to_high_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dic_high_to_low_array</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="c1">#Calculate equilibrium pH and DIC at fixed pCO2 based on varying TA</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alkalinity_array</span><span class="p">)):</span>
+
+        <span class="n">pH_func_deacidification</span> <span class="o">=</span> <span class="n">TA_pH_wrapper</span><span class="p">(</span><span class="n">co2aq_capture</span><span class="p">,</span><span class="n">solve_value</span><span class="o">=</span><span class="n">alkalinity_array</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">pH_deacidification</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">pH_func_deacidification</span><span class="p">,</span><span class="n">deacidification_pH_guess</span><span class="p">)</span>
+        <span class="n">pH_func_acidification</span> <span class="o">=</span> <span class="n">TA_pH_wrapper</span><span class="p">(</span><span class="n">co2aq_outgas</span><span class="p">,</span><span class="n">solve_value</span><span class="o">=</span><span class="n">alkalinity_array</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">pH_acidification</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">pH_func_acidification</span><span class="p">,</span><span class="n">acidification_pH_guess</span><span class="p">)</span>
+
+        <span class="n">dic_deacidification</span> <span class="o">=</span> <span class="n">dic</span><span class="p">(</span><span class="n">co2aq_capture</span><span class="p">,</span><span class="n">pH</span><span class="o">=</span><span class="n">pH_deacidification</span><span class="p">,</span><span class="n">solve_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">dic_acidification</span> <span class="o">=</span> <span class="n">dic</span><span class="p">(</span><span class="n">co2aq_outgas</span><span class="p">,</span><span class="n">pH</span><span class="o">=</span><span class="n">pH_acidification</span><span class="p">,</span><span class="n">solve_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">pH_deacidification_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pH_deacidification</span><span class="p">)</span>
+        <span class="n">pH_acidification_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pH_acidification</span><span class="p">)</span>
+        <span class="n">dic_deacidification_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dic_deacidification</span><span class="p">)</span>
+        <span class="n">dic_acidification_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dic_acidification</span><span class="p">)</span>
+
+    <span class="c1">#Calculate equilibrium pH and DIC at fixed TA based on varying pCO2</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">change_gas_array</span><span class="p">)):</span>
+
+        <span class="n">pH_func_low_to_high</span> <span class="o">=</span> <span class="n">TA_pH_wrapper</span><span class="p">(</span><span class="n">change_gas_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">solve_value</span><span class="o">=</span><span class="n">alkalinity_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">pH_low_to_high</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">pH_func_low_to_high</span><span class="p">,</span><span class="n">pH_low_to_high_guess</span><span class="p">)</span>
+        <span class="n">pH_func_high_to_low</span> <span class="o">=</span> <span class="n">TA_pH_wrapper</span><span class="p">(</span><span class="n">change_gas_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">solve_value</span><span class="o">=</span><span class="n">alkalinity_array</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">pH_high_to_low</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">pH_func_high_to_low</span><span class="p">,</span><span class="n">pH_high_to_low_guess</span><span class="p">)</span>
+
+        <span class="n">dic_low_to_high</span> <span class="o">=</span> <span class="n">dic</span><span class="p">(</span><span class="n">change_gas_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">pH</span><span class="o">=</span><span class="n">pH_low_to_high</span><span class="p">,</span><span class="n">solve_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dic_high_to_low</span> <span class="o">=</span> <span class="n">dic</span><span class="p">(</span><span class="n">change_gas_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">pH</span><span class="o">=</span><span class="n">pH_high_to_low</span><span class="p">,</span><span class="n">solve_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">pH_low_to_high_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pH_low_to_high</span><span class="p">)</span>
+        <span class="n">pH_high_to_low_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pH_high_to_low</span><span class="p">)</span>
+        <span class="n">dic_low_to_high_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dic_low_to_high</span><span class="p">)</span>
+        <span class="n">dic_high_to_low_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dic_high_to_low</span><span class="p">)</span>
+        
+    
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;alkalinity&quot;</span><span class="p">:</span><span class="n">alkalinity_array</span><span class="p">,</span><span class="s2">&quot;change_gas&quot;</span><span class="p">:</span><span class="n">change_gas_array</span><span class="p">,</span><span class="s2">&quot;pH_deacidification&quot;</span><span class="p">:</span><span class="n">pH_deacidification_array</span>
+           <span class="p">,</span><span class="s2">&quot;pH_acidification&quot;</span><span class="p">:</span><span class="n">pH_acidification_array</span><span class="p">,</span><span class="s2">&quot;dic_deacidification&quot;</span><span class="p">:</span><span class="n">dic_deacidification_array</span>
+           <span class="p">,</span><span class="s2">&quot;dic_acidification&quot;</span><span class="p">:</span><span class="n">dic_acidification_array</span><span class="p">,</span><span class="s2">&quot;pH_low_to_high&quot;</span><span class="p">:</span><span class="n">pH_low_to_high_array</span>
+           <span class="p">,</span><span class="s2">&quot;pH_high_to_low&quot;</span><span class="p">:</span><span class="n">pH_high_to_low_array</span><span class="p">,</span><span class="s2">&quot;dic_low_to_high&quot;</span><span class="p">:</span><span class="n">dic_low_to_high_array</span>
+           <span class="p">,</span><span class="s2">&quot;dic_high_to_low&quot;</span><span class="p">:</span><span class="n">dic_high_to_low_array</span><span class="p">,</span><span class="s2">&quot;capture_pco2&quot;</span><span class="p">:</span><span class="n">capture_pco2</span><span class="p">,</span><span class="s2">&quot;outgas_pco2&quot;</span><span class="p">:</span><span class="n">outgas_pco2</span><span class="p">}</span></div>
 </pre></div>
 
            </div>

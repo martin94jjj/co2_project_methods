@@ -129,10 +129,10 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
     """
     Calculates DIC \ :sub:`TA`\, DIC \ :sub:`eq`\, pH  \ :sub:`theory,eq`\ and DIC \ :sub:`theory,eq`\, given the echem_gas_dataframe(**total_df**)
     , **echem_time_df**, which tells the start and end of each echem process, **gas_change_time_df**, which tells when atmosphere CO2 is changed, and the
-    **volume** of the electrolyte in L.\\
+    **volume** of the electrolyte in L.
 
     Values in State 3'i are calculaed based on initially measured pH (pH measured at state 3'i), pCO2, and assuming gas-solution equilibrium (co2aq=pCO2*0.035(Henry's constant))
-    Other states' values are calculated given TA, and using other functions in this module.\\
+    Other states' values are calculated given TA, and using other functions in this module.
 
     **outgas_shift** is necessary when the timing data in **gas_change_df** and **echem_time_df** are off by some time (usually within 30 seconds).
 
@@ -281,3 +281,116 @@ def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.
                          "Delta_DIC_TA":Delta_DIC_TA_array,"Delta_DIC_eq":Delta_DIC_eq_array,
                          "Delta_DIC_theory":Delta_DIC_theory_array
                         })
+
+
+def create_theoretical_dic_pH_array(min_TA = 0,max_TA = 0.2,TA_points=100,capture_pco2 = 0.1,outgas_pco2=1.0,
+                                    pco2_points=100, deacidification_pH_guess = 7.5,
+                                    acidification_pH_guess = 7.5,pH_low_to_high_guess=7.5,
+                                   pH_high_to_low_guess=7.5):
+    
+    """
+    Create theoretical DIC and pH arrays given a max and min total alkalinity
+    , capture and outgas co2 partial pressure. Useful for plotting the thermodynamics of DIC cycle.
+
+    :type min_TA: float
+    :param min_TA: Minimum total alkalinity or alkalinity in the discharged form
+
+    :type max_TA: float
+    :param max_TA: Maximum total alkalinity or alkalinity in the charged form
+
+    :type TA_points: int
+    :param TA_points: Number of points in the TA array. Used in np.linspace
+
+    :type capture_pco2: float
+    :param capture_pco2: CO2 partial pressure in bar during capture process
+
+    :type outgas_pco2: float
+    :param outgas_pco2: CO2 partial pressure in bar during outgas process
+
+    :type pco2_points: int
+    :param pco2_points: Number of points in the CO2 gas change array. Used in np.linspace
+
+    :type deacidification_pH_guess: float
+    :param deacidification_pH_guess: MUST BE A FLOAT. Initial guess of pH in deacidification for scipy.fsolve.
+
+    :type acidification_pH_guess: float
+    :param acidification_pH_guess: MUST BE A FLOAT. Initial guess of pH in acidification for scipy.fsolve.
+
+    :type pH_low_to_high_guess: float 
+    :param pH_low_to_high_guess: MUST BE A FLOAT. Initial guess of pH in gas change fomr low partial pressure to high partial pressure
+                                 for scipy.fsolve.
+
+    :type pH_high_to_low_guess: float
+    :param pH_high_to_low_guess: MUST BE A FLOAT. Initial guess of pH in gas change fomr high partial pressure to low partial pressure
+                                 for scipy.fsolve.
+
+    :rtype: *dict*
+    :return: a dictionary containing TA, DIC, pH array for various processes:
+
+        dict['alkalinity'] -> (*list*): alkalinity array, e.g. 100 points between 0 and 0.2 M\n
+        dict['change_gas'] -> (*list*): gas_change array, e.g. 100 points between 0.1 and 1 bar\n
+        dict['pH_deacidification'] -> (*list*): pH array corresponding to TA and partial pressure in the deacidification process\n
+        dict['pH_acidification'] -> (*list*): pH array corresponding to TA and partial pressure in the acidification process\n
+        dict['dic_deacidification'] -> (*list*): DIC array corresponding to TA and partial pressure in the deacidification process\n
+        dict['dic_acidification'] -> (*list*): DIC array corresponding to TA and partial pressure in the acidification process\n
+        dict['pH_low_to_high'] -> (*list*): pH array corresponding to TA and partial pressure in the low to high gas change process\n
+        dict['pH_high_to_low'] -> (*list*): pH array corresponding to TA and partial pressure in the high to low gas change process\n
+        dict['dic_low_to_high'] -> (*list*): DIC array corresponding to TA and partial pressure in the low to high gas change process\n
+        dict['dic_high_to_low'] -> (*list*): DIC array corresponding to TA and partial pressure in the high to low gas change process\n
+        dict['capture_pco2'] -> (*float*): capture pCO2 as in the input\n
+        dict['outgas_pco2'] -> (*float*): outgas pCO2 as in the input\n
+
+    """
+    alkalinity_array = np.linspace(min_TA,max_TA,TA_points)
+    co2aq100p = 0.035
+    co2aq_outgas = co2aq100p*outgas_pco2
+    co2aq_capture = co2aq100p*capture_pco2
+    pH_deacidification_array = []
+    pH_acidification_array = []
+    dic_deacidification_array = []
+    dic_acidification_array = []
+
+    change_gas_array = np.linspace(co2aq_capture,co2aq_outgas,100)
+
+    pH_low_to_high_array = []
+    pH_high_to_low_array = []
+    dic_low_to_high_array = []
+    dic_high_to_low_array = []
+    
+    #Calculate equilibrium pH and DIC at fixed pCO2 based on varying TA
+    for i in range(len(alkalinity_array)):
+
+        pH_func_deacidification = TA_pH_wrapper(co2aq_capture,solve_value=alkalinity_array[i])
+        pH_deacidification = fsolve(pH_func_deacidification,deacidification_pH_guess)
+        pH_func_acidification = TA_pH_wrapper(co2aq_outgas,solve_value=alkalinity_array[i])
+        pH_acidification = fsolve(pH_func_acidification,acidification_pH_guess)
+
+        dic_deacidification = dic(co2aq_capture,pH=pH_deacidification,solve_value = 0)
+        dic_acidification = dic(co2aq_outgas,pH=pH_acidification,solve_value=0)
+        pH_deacidification_array.append(pH_deacidification)
+        pH_acidification_array.append(pH_acidification)
+        dic_deacidification_array.append(dic_deacidification)
+        dic_acidification_array.append(dic_acidification)
+
+    #Calculate equilibrium pH and DIC at fixed TA based on varying pCO2
+    for i in range(len(change_gas_array)):
+
+        pH_func_low_to_high = TA_pH_wrapper(change_gas_array[i],solve_value=alkalinity_array[-1])
+        pH_low_to_high = fsolve(pH_func_low_to_high,pH_low_to_high_guess)
+        pH_func_high_to_low = TA_pH_wrapper(change_gas_array[i],solve_value=alkalinity_array[0])
+        pH_high_to_low = fsolve(pH_func_high_to_low,pH_high_to_low_guess)
+
+        dic_low_to_high = dic(change_gas_array[i],pH=pH_low_to_high,solve_value=0)
+        dic_high_to_low = dic(change_gas_array[i],pH=pH_high_to_low,solve_value=0)
+
+        pH_low_to_high_array.append(pH_low_to_high)
+        pH_high_to_low_array.append(pH_high_to_low)
+        dic_low_to_high_array.append(dic_low_to_high)
+        dic_high_to_low_array.append(dic_high_to_low)
+        
+    
+    return {"alkalinity":alkalinity_array,"change_gas":change_gas_array,"pH_deacidification":pH_deacidification_array
+           ,"pH_acidification":pH_acidification_array,"dic_deacidification":dic_deacidification_array
+           ,"dic_acidification":dic_acidification_array,"pH_low_to_high":pH_low_to_high_array
+           ,"pH_high_to_low":pH_high_to_low_array,"dic_low_to_high":dic_low_to_high_array
+           ,"dic_high_to_low":dic_high_to_low_array,"capture_pco2":capture_pco2,"outgas_pco2":outgas_pco2}

@@ -315,6 +315,50 @@ or <strong>pH</strong> given carbonate concentration value (enter targeting carb
 </dd></dl>
 
 <dl class="py function">
+<dt id="calc_dic.create_theoretical_dic_pH_array">
+<code class="sig-prename descclassname"><span class="pre">calc_dic.</span></code><code class="sig-name descname"><span class="pre">create_theoretical_dic_pH_array</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_TA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_TA</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TA_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_pco2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_pco2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pco2_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deacidification_pH_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acidification_pH_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_low_to_high_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_high_to_low_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calc_dic.html#create_theoretical_dic_pH_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calc_dic.create_theoretical_dic_pH_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create theoretical DIC and pH arrays given a max and min total alkalinity
+, capture and outgas co2 partial pressure. Useful for plotting the thermodynamics of DIC cycle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_TA</strong> (<em>float</em>) – Minimum total alkalinity or alkalinity in the discharged form</p></li>
+<li><p><strong>max_TA</strong> (<em>float</em>) – Maximum total alkalinity or alkalinity in the charged form</p></li>
+<li><p><strong>TA_points</strong> (<em>int</em>) – Number of points in the TA array. Used in np.linspace</p></li>
+<li><p><strong>capture_pco2</strong> (<em>float</em>) – CO2 partial pressure in bar during capture process</p></li>
+<li><p><strong>outgas_pco2</strong> (<em>float</em>) – CO2 partial pressure in bar during outgas process</p></li>
+<li><p><strong>pco2_points</strong> (<em>int</em>) – Number of points in the CO2 gas change array. Used in np.linspace</p></li>
+<li><p><strong>deacidification_pH_guess</strong> (<em>float</em>) – MUST BE A FLOAT. Initial guess of pH in deacidification for scipy.fsolve.</p></li>
+<li><p><strong>acidification_pH_guess</strong> (<em>float</em>) – MUST BE A FLOAT. Initial guess of pH in acidification for scipy.fsolve.</p></li>
+<li><p><strong>pH_low_to_high_guess</strong> (<em>float</em>) – MUST BE A FLOAT. Initial guess of pH in gas change fomr low partial pressure to high partial pressure
+for scipy.fsolve.</p></li>
+<li><p><strong>pH_high_to_low_guess</strong> (<em>float</em>) – MUST BE A FLOAT. Initial guess of pH in gas change fomr high partial pressure to low partial pressure
+for scipy.fsolve.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>dict</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>a dictionary containing TA, DIC, pH array for various processes:</p>
+<p>dict[‘alkalinity’] -&gt; (<em>list</em>): alkalinity array, e.g. 100 points between 0 and 0.2 M</p>
+<p>dict[‘change_gas’] -&gt; (<em>list</em>): gas_change array, e.g. 100 points between 0.1 and 1 bar</p>
+<p>dict[‘pH_deacidification’] -&gt; (<em>list</em>): pH array corresponding to TA and partial pressure in the deacidification process</p>
+<p>dict[‘pH_acidification’] -&gt; (<em>list</em>): pH array corresponding to TA and partial pressure in the acidification process</p>
+<p>dict[‘dic_deacidification’] -&gt; (<em>list</em>): DIC array corresponding to TA and partial pressure in the deacidification process</p>
+<p>dict[‘dic_acidification’] -&gt; (<em>list</em>): DIC array corresponding to TA and partial pressure in the acidification process</p>
+<p>dict[‘pH_low_to_high’] -&gt; (<em>list</em>): pH array corresponding to TA and partial pressure in the low to high gas change process</p>
+<p>dict[‘pH_high_to_low’] -&gt; (<em>list</em>): pH array corresponding to TA and partial pressure in the high to low gas change process</p>
+<p>dict[‘dic_low_to_high’] -&gt; (<em>list</em>): DIC array corresponding to TA and partial pressure in the low to high gas change process</p>
+<p>dict[‘dic_high_to_low’] -&gt; (<em>list</em>): DIC array corresponding to TA and partial pressure in the high to low gas change process</p>
+<p>dict[‘capture_pco2’] -&gt; (<em>float</em>): capture pCO2 as in the input</p>
+<p>dict[‘outgas_pco2’] -&gt; (<em>float</em>): outgas pCO2 as in the input</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="calc_dic.dic">
 <code class="sig-prename descclassname"><span class="pre">calc_dic.</span></code><code class="sig-name descname"><span class="pre">dic</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">co2aq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solve_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/calc_dic.html#dic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#calc_dic.dic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate DIC given aqueous co2 concentration (<strong>co2aq</strong>) and pH. <strong>solve_value</strong> is used when one tries to solve for <strong>co2aq</strong>
