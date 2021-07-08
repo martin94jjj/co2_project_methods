@@ -231,6 +231,44 @@ and theoretical amount is easy.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="utils.merge_amount_dic_df2">
+<code class="sig-prename descclassname"><span class="pre">utils.</span></code><code class="sig-name descname"><span class="pre">merge_amount_dic_df2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dic_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pco2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theoretical_TA_state3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.22</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#merge_amount_dic_df2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.merge_amount_dic_df2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge <strong>amount_df</strong> and states 1 and 3 of <strong>dic_df</strong> together so comparing experimental cpatured amount
+and theoretical amount is easy. The difference from <cite>merge_amount_dic_df2()</cite> is that it accounts for exact DIC difference between
+states 3 and 3’ instead of pCO2 difference</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dic_df</strong> (<em>pd.DataFrame</em>) – A dataset created by <cite>calc_dic.calc_DIC()</cite> function that contains DIC info at different state and different capture or release amount between states.</p></li>
+<li><p><strong>amount_df</strong> (<em>pd.DataFrame</em>) – A dataset created by <cite>gas_methods.calculate_amount()</cite> function. This dataset contains capture and release amount of CO2 in mL.</p></li>
+<li><p><strong>volume</strong> (<em>float</em>) – Volume in litre. Usually is 0.01 or 10 mL</p></li>
+<li><p><strong>pco2</strong> (<em>float</em>) – pCO2 during capture. Used for correcting Delta_DIC_outgas_exp to effective Delta_DIC using an absolute measure (difference in DIC is only from co2aq difference at 1 bar pCO2 and <strong>pco2</strong> bar pCO2).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>Merged dataset containing Delta_DIC of different source (experimental, TA, eq and theory,eq)</p>
+<p>dataset[‘Delta_DIC_capture_exp’] -&gt; (<em>float</em>): Delta DIC measured during capture according to gas flow</p>
+<p>dataset[‘Delta_DIC_outgas_exp’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to gas flow</p>
+<p>dataset[‘Delta_DIC_TA_capture’] -&gt; (<em>float</em>): Delta DIC measured during capture according to TA and measured pH</p>
+<p>dataset[‘Delta_DIC_TA_outgas’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to TA and measured pH</p>
+<p>dataset[‘Delta_DIC_eq_capture’] -&gt; (<em>float</em>): Delta DIC measured during capture according to measured pH and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_eq_outgas’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to measured pH and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_theory_capture’] -&gt; (<em>float</em>): Delta DIC measured during capture according to TA and theoretical pH given TA and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_theory_outgas’] -&gt; (<em>float</em>): Delta DIC measured during outgas according to TA and theoretical pH given TA and assuming gas solution equilibrium</p>
+<p>dataset[‘Delta_DIC_TA_effective’] -&gt; (<em>float</em>): Effective Delta DIC TA (DIC_TA difference in state 1 and 3)</p>
+<p>dataset[‘Delta_DIC_eq_effective’] -&gt; (<em>float</em>): Effective Delta DIC eq (DIC_eq difference in state 1 and 3)</p>
+<p>dataset[‘Delta_DIC_theory_effective’] -&gt; (<em>float</em>): Effective Delta DIC theory (DIC_theory difference in state 1 and 3)</p>
+<p>dataset[‘Delta_DIC_exp_TA_effective’] -&gt; (<em>float</em>): Effective Delta DIC_exp corrected by dataset[‘Delta_DIC_outgas_exp’]*dataset[‘Delta_DIC_TA_effective’]/dataset[‘Delta_DIC_TA_outgas’] (Assuming two types of measurements give similar results)</p>
+<p>dataset[‘Delta_DIC_exp_abs_effective’] -&gt; (<em>float</em>): Effective Delta DIC_exp corrected by dataset[‘Delta_DIC_outgas_exp’]-(1-<strong>pco2</strong>)*0.035 (Assume the difference in outgas Delta_DIC_measured and effective Delta_DIC is the difference in co2aq)</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="utils.merge_echemEnergy_amountDIC_df">
 <code class="sig-prename descclassname"><span class="pre">utils.</span></code><code class="sig-name descname"><span class="pre">merge_echemEnergy_amountDIC_df</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">echem_energy_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount_DIC_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#merge_echemEnergy_amountDIC_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils.merge_echemEnergy_amountDIC_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merge <strong>echem_energy_df</strong> and <strong>amount_DIC_df</strong>, includes deacidification/acidification and cycle work/molCO2 capture/outgassed effectively

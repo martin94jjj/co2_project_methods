@@ -1,16 +1,11 @@
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import datetime
-import csv
-import sys
-import glob
-from matplotlib.ticker import MultipleLocator
-from scipy.fft import fft,ifft
 import pickle
-from scipy.signal import lfilter,savgol_filter
-from scipy.optimize import fsolve,root_scalar,ridder,anderson,newton_krylov
+from scipy.signal import lfilter
+from scipy.optimize import fsolve
+import calc_dic
+
 
 def merge_echem_gas_df(echem_df,gas_df,co2_fit_path='../20210103_right_CO2_sensor_cubic_spline_fit',max_loop_num=11,co2_heat_conductivity=0.685,flow_offset=0):
     
@@ -129,13 +124,91 @@ def merge_amount_dic_df(dic_df,amount_df,volume=0.01,pco2=0.5):
     
     merged_df = amount_df.merge(dic_capture_df,on='Cycle').merge(dic_outgas_df,on='Cycle')
         
-    #correct the effective amount with the difference in DIC between state 1 and 1'
+    #correct the effective amount with the difference in DIC between state 3' and 3
     dic_1_1prime_diff_df = np.abs(dic_df[dic_df['State']=='1\''].filter(['Cycle','Delta_DIC_TA','Delta_DIC_eq','Delta_DIC_theory']).reset_index(drop=True))
     merged_df['Delta_DIC_TA_effective'] = dic_outgas_df['Delta_DIC_TA_outgas']-dic_1_1prime_diff_df['Delta_DIC_TA']
     merged_df['Delta_DIC_eq_effective'] = dic_outgas_df['Delta_DIC_eq_outgas']-dic_1_1prime_diff_df['Delta_DIC_eq']
     merged_df['Delta_DIC_theory_effective'] = dic_outgas_df['Delta_DIC_theory_outgas']-dic_1_1prime_diff_df['Delta_DIC_theory']
     merged_df['Delta_DIC_exp_TA_effective'] = merged_df['Delta_DIC_outgas_exp']*merged_df['Delta_DIC_TA_effective']/merged_df['Delta_DIC_TA_outgas']
+    
+    
     merged_df['Delta_DIC_exp_abs_effective'] = merged_df['Delta_DIC_outgas_exp']-(1-pco2)*0.035
+
+    return merged_df
+
+
+
+def merge_amount_dic_df2(dic_df,amount_df,volume=0.01,pco2=0.5,theoretical_TA_state3 = 0.22):
+
+    '''
+    Merge **amount_df** and states 1 and 3 of **dic_df** together so comparing experimental cpatured amount 
+    and theoretical amount is easy. The difference from `merge_amount_dic_df2()` is that it accounts for exact DIC difference between
+    states 3 and 3' instead of pCO2 difference
+
+    :type dic_df: pd.DataFrame
+    :param dic_df: A dataset created by `calc_dic.calc_DIC()` function that contains DIC info at different state and different capture or release amount between states.
+
+    :type amount_df: pd.DataFrame
+    :param amount_df: A dataset created by `gas_methods.calculate_amount()` function. This dataset contains capture and release amount of CO2 in mL.
+
+    :type volume: float
+    :param volume: Volume in litre. Usually is 0.01 or 10 mL
+
+    :type pco2: float
+    :param pco2: pCO2 during capture. Used for correcting Delta_DIC_outgas_exp to effective Delta_DIC using an absolute measure (difference in DIC is only from co2aq difference at 1 bar pCO2 and **pco2** bar pCO2). 
+
+    :rtype: *pd.DataFrame*
+    :return: Merged dataset containing Delta_DIC of different source (experimental, TA, eq and theory,eq) 
+    
+            dataset['Delta_DIC_capture_exp'] -> (*float*): Delta DIC measured during capture according to gas flow \n
+            dataset['Delta_DIC_outgas_exp'] -> (*float*): Delta DIC measured during outgas according to gas flow \n
+            dataset['Delta_DIC_TA_capture'] -> (*float*): Delta DIC measured during capture according to TA and measured pH\n
+            dataset['Delta_DIC_TA_outgas'] -> (*float*): Delta DIC measured during outgas according to TA and measured pH\n
+            dataset['Delta_DIC_eq_capture'] -> (*float*): Delta DIC measured during capture according to measured pH and assuming gas solution equilibrium\n
+            dataset['Delta_DIC_eq_outgas'] -> (*float*): Delta DIC measured during outgas according to measured pH and assuming gas solution equilibrium\n
+            dataset['Delta_DIC_theory_capture'] -> (*float*): Delta DIC measured during capture according to TA and theoretical pH given TA and assuming gas solution equilibrium\n
+            dataset['Delta_DIC_theory_outgas'] -> (*float*): Delta DIC measured during outgas according to TA and theoretical pH given TA and assuming gas solution equilibrium\n
+            dataset['Delta_DIC_TA_effective'] -> (*float*): Effective Delta DIC TA (DIC_TA difference in state 1 and 3)\n
+            dataset['Delta_DIC_eq_effective'] -> (*float*): Effective Delta DIC eq (DIC_eq difference in state 1 and 3)\n
+            dataset['Delta_DIC_theory_effective'] -> (*float*): Effective Delta DIC theory (DIC_theory difference in state 1 and 3)\n
+            dataset['Delta_DIC_exp_TA_effective'] -> (*float*): Effective Delta DIC_exp corrected by dataset['Delta_DIC_outgas_exp']*dataset['Delta_DIC_TA_effective']/dataset['Delta_DIC_TA_outgas'] (Assuming two types of measurements give similar results)\n
+            dataset['Delta_DIC_exp_abs_effective'] -> (*float*): Effective Delta DIC_exp corrected by dataset['Delta_DIC_outgas_exp']-(1-**pco2**)*0.035 (Assume the difference in outgas Delta_DIC_measured and effective Delta_DIC is the difference in co2aq)\n
+
+    '''
+
+    dic_capture_df = dic_df[dic_df['State']=='1'].filter(['Cycle','Delta_DIC_TA','Delta_DIC_eq','Delta_DIC_theory']).reset_index(drop=True)
+    dic_capture_df = np.abs(dic_capture_df.rename(columns={"Delta_DIC_TA":"Delta_DIC_TA_capture",'Delta_DIC_eq':'Delta_DIC_eq_capture',
+                                   'Delta_DIC_theory':'Delta_DIC_theory_capture'}))
+    
+    
+    dic_outgas_df = dic_df[dic_df['State']=='3'].filter(['Cycle','Delta_DIC_TA','Delta_DIC_eq','Delta_DIC_theory']).reset_index(drop=True)
+    dic_outgas_df = np.abs(dic_outgas_df.rename(columns={"Delta_DIC_TA":"Delta_DIC_TA_outgas",'Delta_DIC_eq':'Delta_DIC_eq_outgas',
+                                   'Delta_DIC_theory':'Delta_DIC_theory_outgas'}))
+    
+    amount_df = amount_df.rename(columns={'Cycle_Number':'Cycle'})
+    amount_df['Delta_DIC_capture_exp'] = amount_df['Capture_Amount']/1000/24.01/volume
+    amount_df['Delta_DIC_outgas_exp'] = amount_df['Outgas_Amount']/1000/24.01/volume
+    
+    merged_df = amount_df.merge(dic_capture_df,on='Cycle').merge(dic_outgas_df,on='Cycle')
+        
+    #correct the effective amount with the difference in DIC between state 3' and 3
+    dic_1_1prime_diff_df = np.abs(dic_df[dic_df['State']=='1\''].filter(['Cycle','Delta_DIC_TA','Delta_DIC_eq','Delta_DIC_theory']).reset_index(drop=True))
+    merged_df['Delta_DIC_TA_effective'] = dic_outgas_df['Delta_DIC_TA_outgas']-dic_1_1prime_diff_df['Delta_DIC_TA']
+    merged_df['Delta_DIC_eq_effective'] = dic_outgas_df['Delta_DIC_eq_outgas']-dic_1_1prime_diff_df['Delta_DIC_eq']
+    merged_df['Delta_DIC_theory_effective'] = dic_outgas_df['Delta_DIC_theory_outgas']-dic_1_1prime_diff_df['Delta_DIC_theory']
+    merged_df['Delta_DIC_exp_TA_effective'] = merged_df['Delta_DIC_outgas_exp']*merged_df['Delta_DIC_TA_effective']/merged_df['Delta_DIC_TA_outgas']
+    
+    pH_func_state3 = calc_dic.TA_pH_wrapper(1*0.035,solve_value=theoretical_TA_state3)
+    pH_state3 = fsolve(pH_func_state3,7.5)
+    dic_state3 = calc_dic.dic(1*0.035,pH=pH_state3,solve_value=0)
+
+    pH_func_state3prime = calc_dic.TA_pH_wrapper(pco2*0.035,solve_value=theoretical_TA_state3)
+    pH_state3prime = fsolve(pH_func_state3prime,7.5)
+    dic_state3prime = calc_dic.dic(pco2*0.035,pH=pH_state3prime)
+
+    difference=dic_state3-dic_state3prime
+
+    merged_df['Delta_DIC_exp_abs_effective'] = merged_df['Delta_DIC_outgas_exp']-difference
 
     return merged_df
 
