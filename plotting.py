@@ -137,7 +137,7 @@ def plot_baseline_selection(total_df,capture=True,cycle=5,time_change_period=108
     plt.show()
 
 
-def plot_theoretical_dic_pH_TA(data_dict,x='TA',y='DIC',legend=True):
+def plot_theoretical_dic_pH_TA(data_dict,x='TA',y='DIC',legend=True,xlim_low = None,xlim_high=None,ylim_low=None,ylim_high=None,save_name=None):
     """
     Plot relationship among TA, DIC and pH. Can change x and y freely depending on the content to be plotted.
 
@@ -150,9 +150,25 @@ def plot_theoretical_dic_pH_TA(data_dict,x='TA',y='DIC',legend=True):
     :type legend: bool
     :param legend: *True* if you want to show the legend
 
+    :type xlim_low: float
+    :param xlim_low: low xlim for `ax.set_xlim()`
+
+    :type xlim_high: float
+    :param xlim_high: high xlim for `ax.set_xlim()`
+
+    :type ylim_low: float
+    :param ylim_low: low ylim for `ax.set_ylim()`
+
+    :type ylim_high: float
+    :param ylim_high: high ylim for `ax.set_ylim()`
+
+    :type save_name: string
+    :param save_name: file name of the figure to be saved.
+
     :rtype: None
     :return: Plot an image of DIC vs. pH (or other combinations of DIC, pH and TA) 
     """
+    
     fig,ax=plt.subplots(1,1,figsize=(5.941,4.630),dpi=400)
     
     if x=='TA' or x =='ta':
@@ -209,8 +225,13 @@ def plot_theoretical_dic_pH_TA(data_dict,x='TA',y='DIC',legend=True):
     ax.tick_params(axis='x',which='minor',direction='in',bottom=True,length=3)
     ax.tick_params(axis='x',which='major',direction='in',bottom=True,length=5.5)
     ax.set_xlabel(xlabel)
+    if xlim_low:
+        ax.set_xlim(xlim_low,xlim_high)
+    if ylim_low:
+        ax.set_ylim(ylim_low,ylim_high)
     #ax.set_title("DIC vs. pH for Capture @ 0.1 bar pCO2 2M ΔTA")
-
+    if save_name:
+        plt.savefig(save_name, dpi=400)
     #ax.set_ylim(-0.3,2.2)
     #ax.set_xlim(3,10.1)
     plt.minorticks_on()
