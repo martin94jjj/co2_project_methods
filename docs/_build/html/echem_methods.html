@@ -200,7 +200,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<em>string</em>) – the address of the file</p></li>
+<li><p><strong>file</strong> (<em>_io.TextIOWrapper object</em>) – opened file passed in from <cite>read_echem</cite></p></li>
 <li><p><strong>starting_date_time</strong> (<em>datetime.datetime</em>) – the initial datetime of the process</p></li>
 </ul>
 </dd>
@@ -212,8 +212,12 @@
 dataset -&gt; pandas.DataFrame: a dataset contains the following attributes</p>
 <p>dataset[‘Delta_T_s’] -&gt; float: time in seconds since the start of the process</p>
 <p>dataset[‘Time’] -&gt; datetime.datetime: datetime of the current datum point</p>
-<p>dataset[‘Voltage’] -&gt; float: voltage data</p>
-<p>dataset[‘Current’] -&gt; float: current data</p>
+<p>dataset[‘Cycle_number’] -&gt; int: current cycle number</p>
+<p>dataset[‘Echem_process’] -&gt; str: PWRCHARGE refers to charge and PWRDISCHARGE refers to discharge</p>
+<p>dataset[‘Voltage’] -&gt; float: voltage data in V</p>
+<p>dataset[‘Current’] -&gt; float: current data in A</p>
+<p>dataset[‘Capacity’] -&gt; float: capacity in Coulomb</p>
+<p>dataset[‘Temperature’] -&gt; float: temperature data in degree Celsius</p>
 <p>dataset[‘pH’] -&gt; float: pH data</p>
 <p>dataset[‘fitted_pH’] -&gt; float: fitted pH data. Fluctuations were removed.</p>
 </p>
@@ -462,8 +466,12 @@ in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH 
 <dd class="field-odd"><p><p><strong>dataset</strong>: a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.</p>
 <p>dataset -&gt; pandas.DataFrame: a dataset contains the following attributes</p>
 <p>dataset[‘Time’] -&gt; datetime.datetime: datetime of the current datum point</p>
+<p>dataset[‘Cycle_number’] -&gt; int: current cycle number</p>
+<p>dataset[‘Echem_process’] -&gt; str: PWRCHARGE refers to charge and PWRDISCHARGE refers to discharge</p>
 <p>dataset[‘Voltage’] -&gt; float: voltage data</p>
 <p>dataset[‘Current’] -&gt; float: current data</p>
+<p>dataset[‘Capacity’] -&gt; float: capacity in Coulomb</p>
+<p>dataset[‘Temperature] -&gt; float: temperature data</p>
 <p>dataset[‘pH’] -&gt; float: pH data</p>
 <p>dataset[‘fitted_pH’] -&gt; float: fitted pH data. Fluctuations were removed.</p>
 </p>

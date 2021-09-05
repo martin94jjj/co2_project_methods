@@ -167,8 +167,7 @@
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">lfilter</span><span class="p">,</span><span class="n">savgol_filter</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fsolve</span><span class="p">,</span><span class="n">root_scalar</span><span class="p">,</span><span class="n">ridder</span><span class="p">,</span><span class="n">anderson</span><span class="p">,</span><span class="n">newton_krylov</span>
-
-
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <div class="viewcode-block" id="find_date_time"><a class="viewcode-back" href="../echem_methods.html#echem_methods.find_date_time">[docs]</a><span class="k">def</span> <span class="nf">find_date_time</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
     
@@ -199,8 +198,8 @@
     <span class="sd">&#39;&#39;&#39;    </span>
 <span class="sd">    Reads a Gamry file and the starting time of the first file (e.g. the time of the creation or the last time point of previous half cycle). Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.</span>
 
-<span class="sd">    :type file: string</span>
-<span class="sd">    :param file: the address of the file</span>
+<span class="sd">    :type file: _io.TextIOWrapper object</span>
+<span class="sd">    :param file: opened file passed in from `read_echem`</span>
 
 <span class="sd">    :type starting_date_time: datetime.datetime</span>
 <span class="sd">    :param starting_date_time: the initial datetime of the process</span>
@@ -211,8 +210,12 @@
 <span class="sd">            dataset -&gt; pandas.DataFrame: a dataset contains the following attributes\n</span>
 <span class="sd">            dataset[&#39;Delta_T_s&#39;] -&gt; float: time in seconds since the start of the process\n</span>
 <span class="sd">            dataset[&#39;Time&#39;] -&gt; datetime.datetime: datetime of the current datum point\n</span>
-<span class="sd">            dataset[&#39;Voltage&#39;] -&gt; float: voltage data\n</span>
-<span class="sd">            dataset[&#39;Current&#39;] -&gt; float: current data\n</span>
+<span class="sd">            dataset[&#39;Cycle_number&#39;] -&gt; int: current cycle number\n</span>
+<span class="sd">            dataset[&#39;Echem_process&#39;] -&gt; str: PWRCHARGE refers to charge and PWRDISCHARGE refers to discharge\n</span>
+<span class="sd">            dataset[&#39;Voltage&#39;] -&gt; float: voltage data in V\n</span>
+<span class="sd">            dataset[&#39;Current&#39;] -&gt; float: current data in A\n</span>
+<span class="sd">            dataset[&#39;Capacity&#39;] -&gt; float: capacity in Coulomb\n</span>
+<span class="sd">            dataset[&#39;Temperature&#39;] -&gt; float: temperature data in degree Celsius\n</span>
 <span class="sd">            dataset[&#39;pH&#39;] -&gt; float: pH data\n</span>
 <span class="sd">            dataset[&#39;fitted_pH&#39;] -&gt; float: fitted pH data. Fluctuations were removed.\n</span>
 
@@ -226,6 +229,12 @@
     <span class="n">voltage_array</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">current_array</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">total_time_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">temperature_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cycle_number_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">echem_process_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">capacity_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cycle_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_#&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">echem_process</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_#&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
         <span class="c1">#finds the first row where actual data is recorded</span>
         <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;	0&#39;</span><span class="p">):</span>
@@ -233,21 +242,26 @@
 
         <span class="c1"># row.split()[0]! is to avoid the last row of string</span>
         <span class="k">if</span> <span class="n">indicator</span> <span class="ow">and</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;STARTTIMEOFFSET&#39;</span><span class="p">:</span>
+            
+            <span class="n">splited_row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 
             <span class="c1">#voltage array</span>
-            <span class="n">voltage_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="n">voltage_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">splited_row</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
 
             <span class="c1">#time array(for the purpose of calculating capacity)</span>
-            <span class="n">time_delta_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">time_delta_s</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">splited_row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">t_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time_delta_s</span><span class="p">)</span>
             <span class="n">total_time_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">starting_date_time</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">time_delta_s</span><span class="p">))</span>
 
             <span class="c1">#pH arrays</span>
-            <span class="n">pH_array_left</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">11</span><span class="p">])</span><span class="o">*-</span><span class="mf">17.602</span><span class="p">)</span><span class="o">+</span><span class="mf">7.1728</span><span class="p">)</span>       
-            <span class="n">pH_array_right</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">17</span><span class="p">])</span><span class="o">*-</span><span class="mf">17.4</span><span class="p">)</span><span class="o">+</span><span class="mf">7.7278</span><span class="p">)</span>       
+            <span class="n">pH_array_left</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">splited_row</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span><span class="o">*-</span><span class="mf">17.602</span><span class="p">)</span><span class="o">+</span><span class="mf">7.1728</span><span class="p">)</span>       
+            <span class="n">pH_array_right</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">splited_row</span><span class="p">[</span><span class="mi">17</span><span class="p">])</span><span class="o">*-</span><span class="mf">17.4</span><span class="p">)</span><span class="o">+</span><span class="mf">7.7278</span><span class="p">)</span>       
 
             <span class="c1">#current array</span>
-            <span class="n">current_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="n">current_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">splited_row</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+
+            <span class="c1">#temperature array</span>
+            <span class="n">temperature_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">splited_row</span><span class="p">[</span><span class="mi">8</span><span class="p">]))</span>
             
     <span class="c1">#remove unnecessary glitches on the pH data through fitting</span>
     <span class="n">pH_fit_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">t_array</span><span class="p">,</span><span class="n">pH_array_left</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
@@ -257,10 +271,17 @@
     <span class="n">pH_fit_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">t_array</span><span class="p">,</span><span class="n">pH_array_right</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
     <span class="n">total_pH_fit_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">pH_fit_right</span><span class="p">)</span>
     <span class="n">fitted_pH_array_right</span> <span class="o">=</span> <span class="n">total_pH_fit_right</span><span class="p">(</span><span class="n">t_array</span><span class="p">)</span>
-    
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Delta_T_s&#39;</span><span class="p">:</span><span class="n">t_array</span><span class="p">,</span><span class="s1">&#39;Time&#39;</span><span class="p">:</span><span class="n">total_time_array</span><span class="p">,</span><span class="s1">&#39;Voltage&#39;</span><span class="p">:</span><span class="n">voltage_array</span><span class="p">,</span>
-                        <span class="s1">&#39;Current&#39;</span><span class="p">:</span><span class="n">current_array</span><span class="p">,</span><span class="s1">&#39;pH_left&#39;</span><span class="p">:</span><span class="n">pH_array_left</span><span class="p">,</span><span class="s1">&#39;pH_right&#39;</span><span class="p">:</span><span class="n">pH_array_right</span>
-                        <span class="p">,</span><span class="s1">&#39;fitted_pH_left&#39;</span><span class="p">:</span><span class="n">fitted_pH_array_left</span><span class="p">,</span><span class="s1">&#39;fitted_pH_right&#39;</span><span class="p">:</span><span class="n">fitted_pH_array_right</span><span class="p">})</span>
+
+    <span class="c1">#Assign cycle number and type of echem_process to the dataframe</span>
+    <span class="n">cycle_number_array</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">total_time_array</span><span class="p">)</span><span class="o">*</span><span class="p">[</span><span class="n">cycle_number</span><span class="p">]</span>
+    <span class="n">echem_process_array</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">total_time_array</span><span class="p">)</span><span class="o">*</span><span class="p">[</span><span class="n">echem_process</span><span class="p">]</span>
+
+    <span class="c1">#calculate capacity of this half cycle</span>
+    <span class="n">capacity_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">current_array</span><span class="p">)</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Delta_T_s&#39;</span><span class="p">:</span><span class="n">t_array</span><span class="p">,</span><span class="s1">&#39;Cycle_number&#39;</span><span class="p">:</span><span class="n">cycle_number_array</span><span class="p">,</span><span class="s1">&#39;Echem_process&#39;</span><span class="p">:</span><span class="n">echem_process_array</span><span class="p">,</span><span class="s1">&#39;Time&#39;</span><span class="p">:</span><span class="n">total_time_array</span><span class="p">,</span><span class="s1">&#39;Voltage&#39;</span><span class="p">:</span><span class="n">voltage_array</span><span class="p">,</span>
+                        <span class="s1">&#39;Current&#39;</span><span class="p">:</span><span class="n">current_array</span><span class="p">,</span><span class="s1">&#39;Capacity&#39;</span><span class="p">:</span><span class="n">capacity_array</span><span class="p">,</span><span class="s1">&#39;pH_left&#39;</span><span class="p">:</span><span class="n">pH_array_left</span><span class="p">,</span><span class="s1">&#39;pH_right&#39;</span><span class="p">:</span><span class="n">pH_array_right</span>
+                        <span class="p">,</span><span class="s1">&#39;fitted_pH_left&#39;</span><span class="p">:</span><span class="n">fitted_pH_array_left</span><span class="p">,</span><span class="s1">&#39;fitted_pH_right&#39;</span><span class="p">:</span><span class="n">fitted_pH_array_right</span><span class="p">,</span><span class="s1">&#39;Temperature&#39;</span><span class="p">:</span><span class="n">temperature_array</span><span class="p">})</span>
     
     
     <span class="k">return</span> <span class="n">dataset</span></div>
@@ -313,8 +334,12 @@
 
 <span class="sd">            dataset -&gt; pandas.DataFrame: a dataset contains the following attributes\n</span>
 <span class="sd">            dataset[&#39;Time&#39;] -&gt; datetime.datetime: datetime of the current datum point\n</span>
+<span class="sd">            dataset[&#39;Cycle_number&#39;] -&gt; int: current cycle number\n</span>
+<span class="sd">            dataset[&#39;Echem_process&#39;] -&gt; str: PWRCHARGE refers to charge and PWRDISCHARGE refers to discharge\n</span>
 <span class="sd">            dataset[&#39;Voltage&#39;] -&gt; float: voltage data\n</span>
 <span class="sd">            dataset[&#39;Current&#39;] -&gt; float: current data\n</span>
+<span class="sd">            dataset[&#39;Capacity&#39;] -&gt; float: capacity in Coulomb\n</span>
+<span class="sd">            dataset[&#39;Temperature] -&gt; float: temperature data\n</span>
 <span class="sd">            dataset[&#39;pH&#39;] -&gt; float: pH data\n</span>
 <span class="sd">            dataset[&#39;fitted_pH&#39;] -&gt; float: fitted pH data. Fluctuations were removed.\n</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -327,8 +352,8 @@
     <span class="n">voltage_hold_srcdir</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span><span class="s1">&#39;OTHER/&#39;</span>
     <span class="n">voltage_hold_files</span> <span class="o">=</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">voltage_hold_srcdir</span><span class="o">+</span><span class="s1">&#39;*.DTA&#39;</span><span class="p">)</span>
     
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="s1">&#39;Voltage&#39;</span><span class="p">,</span><span class="s1">&#39;Current&#39;</span><span class="p">,</span><span class="s1">&#39;pH_left&#39;</span><span class="p">,</span><span class="s1">&#39;pH_right&#39;</span>
-                                      <span class="p">,</span><span class="s1">&#39;fitted_pH_left&#39;</span><span class="p">,</span><span class="s1">&#39;fitted_pH_right&#39;</span><span class="p">])</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="s1">&#39;Cycle_number&#39;</span><span class="p">,</span><span class="s1">&#39;Echem_process&#39;</span><span class="p">,</span><span class="s1">&#39;Voltage&#39;</span><span class="p">,</span><span class="s1">&#39;Current&#39;</span><span class="p">,</span><span class="s1">&#39;Capacity&#39;</span><span class="p">,</span><span class="s1">&#39;pH_left&#39;</span><span class="p">,</span><span class="s1">&#39;pH_right&#39;</span>
+                                      <span class="p">,</span><span class="s1">&#39;fitted_pH_left&#39;</span><span class="p">,</span><span class="s1">&#39;fitted_pH_right&#39;</span><span class="p">,</span><span class="s1">&#39;Temperature&#39;</span><span class="p">])</span>
 
     <span class="c1">###initialize the starting time using the first charging file###</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#1.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">initial_file</span><span class="p">:</span>
@@ -343,7 +368,7 @@
     <span class="c1"># 3.Append i+1 cycle&#39;s CO2 infusing data</span>
     <span class="c1"># 4.Append i+1 cycle&#39;s Discharge Data</span>
     <span class="c1"># 5.Append i+1 cycle&#39;s CO2 outgasing data</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cycle_number</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">cycle_number</span><span class="p">)):</span>
         
         <span class="c1">##Deacidification (Charge)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">srcdir</span><span class="o">+</span><span class="s1">&#39;PWRCHARGE_#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.DTA&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>

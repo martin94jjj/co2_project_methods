@@ -10,8 +10,7 @@ from scipy.fft import fft,ifft
 import pickle
 from scipy.signal import lfilter,savgol_filter
 from scipy.optimize import fsolve,root_scalar,ridder,anderson,newton_krylov
-
-
+from tqdm import tqdm
 
 def find_date_time(file):
     
@@ -42,8 +41,8 @@ def analyze_gamry_file(file,starting_date_time):
     '''    
     Reads a Gamry file and the starting time of the first file (e.g. the time of the creation or the last time point of previous half cycle). Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.
 
-    :type file: string
-    :param file: the address of the file
+    :type file: _io.TextIOWrapper object
+    :param file: opened file passed in from `read_echem`
 
     :type starting_date_time: datetime.datetime
     :param starting_date_time: the initial datetime of the process
@@ -54,8 +53,12 @@ def analyze_gamry_file(file,starting_date_time):
             dataset -> pandas.DataFrame: a dataset contains the following attributes\n
             dataset['Delta_T_s'] -> float: time in seconds since the start of the process\n
             dataset['Time'] -> datetime.datetime: datetime of the current datum point\n
-            dataset['Voltage'] -> float: voltage data\n
-            dataset['Current'] -> float: current data\n
+            dataset['Cycle_number'] -> int: current cycle number\n
+            dataset['Echem_process'] -> str: PWRCHARGE refers to charge and PWRDISCHARGE refers to discharge\n
+            dataset['Voltage'] -> float: voltage data in V\n
+            dataset['Current'] -> float: current data in A\n
+            dataset['Capacity'] -> float: capacity in Coulomb\n
+            dataset['Temperature'] -> float: temperature data in degree Celsius\n
             dataset['pH'] -> float: pH data\n
             dataset['fitted_pH'] -> float: fitted pH data. Fluctuations were removed.\n
 
@@ -69,6 +72,12 @@ def analyze_gamry_file(file,starting_date_time):
     voltage_array = []
     current_array = []
     total_time_array = []
+    temperature_array = []
+    cycle_number_array = []
+    echem_process_array = []
+    capacity_array = []
+    cycle_number = int(file.name.split('/')[-1].split('_#')[1].split('.')[0])
+    echem_process = file.name.split('/')[-1].split('_#')[0]
     for row in file:
         #finds the first row where actual data is recorded
         if row.startswith('	0'):
@@ -76,21 +85,26 @@ def analyze_gamry_file(file,starting_date_time):
 
         # row.split()[0]! is to avoid the last row of string
         if indicator and row.split()[0]!='STARTTIMEOFFSET':
+            
+            splited_row = row.split()
 
             #voltage array
-            voltage_array.append(float(row.split()[2]))
+            voltage_array.append(float(splited_row[2]))
 
             #time array(for the purpose of calculating capacity)
-            time_delta_s = float(row.split()[1])
+            time_delta_s = float(splited_row[1])
             t_array.append(time_delta_s)
             total_time_array.append(starting_date_time + datetime.timedelta(seconds=time_delta_s))
 
             #pH arrays
-            pH_array_left.append((float(row.split()[11])*-17.602)+7.1728)       
-            pH_array_right.append((float(row.split()[17])*-17.4)+7.7278)       
+            pH_array_left.append((float(splited_row[11])*-17.602)+7.1728)       
+            pH_array_right.append((float(splited_row[17])*-17.4)+7.7278)       
 
             #current array
-            current_array.append(float(row.split()[3]))
+            current_array.append(float(splited_row[3]))
+
+            #temperature array
+            temperature_array.append(float(splited_row[8]))
             
     #remove unnecessary glitches on the pH data through fitting
     pH_fit_left = np.polyfit(t_array,pH_array_left,6)
@@ -100,10 +114,17 @@ def analyze_gamry_file(file,starting_date_time):
     pH_fit_right = np.polyfit(t_array,pH_array_right,6)
     total_pH_fit_right = np.poly1d(pH_fit_right)
     fitted_pH_array_right = total_pH_fit_right(t_array)
-    
-    dataset = pd.DataFrame({'Delta_T_s':t_array,'Time':total_time_array,'Voltage':voltage_array,
-                        'Current':current_array,'pH_left':pH_array_left,'pH_right':pH_array_right
-                        ,'fitted_pH_left':fitted_pH_array_left,'fitted_pH_right':fitted_pH_array_right})
+
+    #Assign cycle number and type of echem_process to the dataframe
+    cycle_number_array = len(total_time_array)*[cycle_number]
+    echem_process_array = len(total_time_array)*[echem_process]
+
+    #calculate capacity of this half cycle
+    capacity_array = np.cumsum(current_array)
+
+    dataset = pd.DataFrame({'Delta_T_s':t_array,'Cycle_number':cycle_number_array,'Echem_process':echem_process_array,'Time':total_time_array,'Voltage':voltage_array,
+                        'Current':current_array,'Capacity':capacity_array,'pH_left':pH_array_left,'pH_right':pH_array_right
+                        ,'fitted_pH_left':fitted_pH_array_left,'fitted_pH_right':fitted_pH_array_right,'Temperature':temperature_array})
     
     
     return dataset
@@ -156,8 +177,12 @@ def read_echem(path,cycle_number=5,co2=True):
 
             dataset -> pandas.DataFrame: a dataset contains the following attributes\n
             dataset['Time'] -> datetime.datetime: datetime of the current datum point\n
+            dataset['Cycle_number'] -> int: current cycle number\n
+            dataset['Echem_process'] -> str: PWRCHARGE refers to charge and PWRDISCHARGE refers to discharge\n
             dataset['Voltage'] -> float: voltage data\n
             dataset['Current'] -> float: current data\n
+            dataset['Capacity'] -> float: capacity in Coulomb\n
+            dataset['Temperature] -> float: temperature data\n
             dataset['pH'] -> float: pH data\n
             dataset['fitted_pH'] -> float: fitted pH data. Fluctuations were removed.\n
     '''
@@ -170,8 +195,8 @@ def read_echem(path,cycle_number=5,co2=True):
     voltage_hold_srcdir = path +'OTHER/'
     voltage_hold_files =glob.glob(voltage_hold_srcdir+'*.DTA')
     
-    dataset = pd.DataFrame(columns = ['Time','Voltage','Current','pH_left','pH_right'
-                                      ,'fitted_pH_left','fitted_pH_right'])
+    dataset = pd.DataFrame(columns = ['Time','Cycle_number','Echem_process','Voltage','Current','Capacity','pH_left','pH_right'
+                                      ,'fitted_pH_left','fitted_pH_right','Temperature'])
 
     ###initialize the starting time using the first charging file###
     with open(srcdir+'PWRCHARGE_#1.DTA','r') as initial_file:
@@ -186,7 +211,7 @@ def read_echem(path,cycle_number=5,co2=True):
     # 3.Append i+1 cycle's CO2 infusing data
     # 4.Append i+1 cycle's Discharge Data
     # 5.Append i+1 cycle's CO2 outgasing data
-    for i in range(cycle_number):
+    for i in tqdm(range(cycle_number)):
         
         ##Deacidification (Charge)
         with open(srcdir+'PWRCHARGE_#'+str(i+1)+'.DTA','r') as file:
