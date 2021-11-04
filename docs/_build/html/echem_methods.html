@@ -195,13 +195,15 @@
 <span id="echem-methods-module"></span><h1>echem_methods module<a class="headerlink" href="#module-echem_methods" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="echem_methods.analyze_gamry_file">
-<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">analyze_gamry_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_date_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#analyze_gamry_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.analyze_gamry_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">analyze_gamry_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_date_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_right_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'intercept':</span> <span class="pre">7.728,</span> <span class="pre">'slope':</span> <span class="pre">-</span> <span class="pre">17.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_left_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'intercept':</span> <span class="pre">7.1728,</span> <span class="pre">'slope':</span> <span class="pre">-</span> <span class="pre">17.602}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#analyze_gamry_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.analyze_gamry_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a Gamry file and the starting time of the first file (e.g. the time of the creation or the last time point of previous half cycle). Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>_io.TextIOWrapper object</em>) – opened file passed in from <cite>read_echem</cite></p></li>
 <li><p><strong>starting_date_time</strong> (<em>datetime.datetime</em>) – the initial datetime of the process</p></li>
+<li><p><strong>pH_right_calibration</strong> (<em>dict</em>) – dictionary that contains the slope of intercept information of the right pH probe calibration</p></li>
+<li><p><strong>pH_left_calibration</strong> (<em>dict</em>) – dictionary that contains the slope of intercept information of the left pH probe calibration</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -288,7 +290,7 @@ puts everything together in a dataset with multi-cycle’s cycle capacity,energy
 
 <dl class="py function">
 <dt id="echem_methods.create_echem_dfs">
-<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">create_echem_dfs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">165</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#create_echem_dfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.create_echem_dfs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">create_echem_dfs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgas_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">165</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_right_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'intercept':</span> <span class="pre">7.728,</span> <span class="pre">'slope':</span> <span class="pre">-</span> <span class="pre">17.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_left_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'intercept':</span> <span class="pre">7.1728,</span> <span class="pre">'slope':</span> <span class="pre">-</span> <span class="pre">17.602}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#create_echem_dfs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.create_echem_dfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine the results of <strong>read_echem</strong>, <strong>cal_capacity_energy</strong>,
 and <strong>find_echem_time_period</strong> to produce a dictionary of the three dfs.</p>
 <blockquote>
@@ -330,6 +332,8 @@ and <strong>find_echem_time_period</strong> to produce a dictionary of the three
 <li><p><strong>co2</strong> (<em>boolean</em>) – whether CO2 capture/release took place</p></li>
 <li><p><strong>outgas_time</strong> (<em>float</em>) – time in minutes for the outgas period</p></li>
 <li><p><strong>cycle_number</strong> (<em>int</em>) – number of cycles</p></li>
+<li><p><strong>pH_right_calibration</strong> (<em>dict</em>) – dictionary that contains the slope of intercept information of the right pH probe calibration</p></li>
+<li><p><strong>pH_left_calibration</strong> (<em>dict</em>) – dictionary that contains the slope of intercept information of the left pH probe calibration</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -419,7 +423,7 @@ dataset -&gt; pandas.DataFrame: a dataset that contains the following attributes
 
 <dl class="py function">
 <dt id="echem_methods.read_echem">
-<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">read_echem</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#read_echem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.read_echem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">read_echem</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cycle_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">co2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_right_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'intercept':</span> <span class="pre">7.728,</span> <span class="pre">'slope':</span> <span class="pre">-</span> <span class="pre">17.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pH_left_calibration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'intercept':</span> <span class="pre">7.1728,</span> <span class="pre">'slope':</span> <span class="pre">-</span> <span class="pre">17.602}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#read_echem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.read_echem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a Gamry file folder, utilizes <strong>analyze_gamry_file</strong> to get half-cycle data and puts everything together
 in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.</p>
 <div class="admonition warning">
@@ -457,6 +461,8 @@ in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH 
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>string</em>) – folder path</p></li>
 <li><p><strong>cycle_number</strong> (<em>int</em>) – number of full electrochemical cycles performed.</p></li>
+<li><p><strong>pH_right_calibration</strong> (<em>dict</em>) – dictionary that contains the slope of intercept information of the right pH probe calibration</p></li>
+<li><p><strong>pH_left_calibration</strong> (<em>dict</em>) – dictionary that contains the slope of intercept information of the left pH probe calibration</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -474,6 +480,28 @@ in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH 
 <p>dataset[‘Temperature] -&gt; float: temperature data</p>
 <p>dataset[‘pH’] -&gt; float: pH data</p>
 <p>dataset[‘fitted_pH’] -&gt; float: fitted pH data. Fluctuations were removed.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="echem_methods.read_gamry_eis">
+<code class="sig-prename descclassname"><span class="pre">echem_methods.</span></code><code class="sig-name descname"><span class="pre">read_gamry_eis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/echem_methods.html#read_gamry_eis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#echem_methods.read_gamry_eis" title="Permalink to this definition">¶</a></dt>
+<dd><p>read Gamry EIS file and output a dataframe containing frequency, Zreal and Zimag</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>string</em>) – the address of the folder that contains the electrochemistry files.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><em>pd.DataFrame</em></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>a dataset that contains frequency,Zreal and Zimag
+dataset -&gt; pandas.DataFrame: a dataset that contains the following attributes</p>
+<p>dataset[‘frequency’] -&gt; float: frequency</p>
+<p>dataset[‘Zreal’] -&gt; float: real axis impedance</p>
+<p>dataset[‘Zimag’] -&gt; float: imaginary axis impedance</p>
 </p>
 </dd>
 </dl>

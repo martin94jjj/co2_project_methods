@@ -12,6 +12,8 @@ from scipy.signal import lfilter,savgol_filter
 from scipy.optimize import fsolve,root_scalar,ridder,anderson,newton_krylov
 from tqdm import tqdm
 
+
+
 def find_date_time(file):
     
     ''' 
@@ -37,7 +39,7 @@ def find_date_time(file):
     starting_date_time = datetime.datetime(year,month,day,hour,minute,second)
     return starting_date_time
 
-def analyze_gamry_file(file,starting_date_time):
+def analyze_gamry_file(file,starting_date_time,pH_right_calibration={'slope':-17.4,'intercept':7.728},pH_left_calibration={'slope':-17.602,'intercept':7.1728}):
     '''    
     Reads a Gamry file and the starting time of the first file (e.g. the time of the creation or the last time point of previous half cycle). Returns a dataset with continuous Time, Voltage, Current, pH and fitted pH for a half-cycle.
 
@@ -46,6 +48,12 @@ def analyze_gamry_file(file,starting_date_time):
 
     :type starting_date_time: datetime.datetime
     :param starting_date_time: the initial datetime of the process
+
+    :type pH_right_calibration: dict
+    :param pH_right_calibration: dictionary that contains the slope of intercept information of the right pH probe calibration
+
+    :type pH_left_calibration: dict
+    :param pH_left_calibration: dictionary that contains the slope of intercept information of the left pH probe calibration
    
     
     :rtype: *pd.DataFrame*
@@ -97,8 +105,8 @@ def analyze_gamry_file(file,starting_date_time):
             total_time_array.append(starting_date_time + datetime.timedelta(seconds=time_delta_s))
 
             #pH arrays
-            pH_array_left.append((float(splited_row[11])*-17.602)+7.1728)       
-            pH_array_right.append((float(splited_row[17])*-17.4)+7.7278)       
+            pH_array_left.append((float(splited_row[11])*pH_left_calibration['slope'])+pH_left_calibration['intercept'])       
+            pH_array_right.append((float(splited_row[17])*pH_right_calibration['slope'])+pH_right_calibration['intercept'])       
 
             #current array
             current_array.append(float(splited_row[3]))
@@ -130,7 +138,7 @@ def analyze_gamry_file(file,starting_date_time):
     return dataset
 
 
-def read_echem(path,cycle_number=5,co2=True):
+def read_echem(path,cycle_number=5,co2=True,pH_right_calibration={'slope':-17.4,'intercept':7.728},pH_left_calibration={'slope':-17.602,'intercept':7.1728}):
     '''    
     Reads a Gamry file folder, utilizes **analyze_gamry_file** to get half-cycle data and puts everything together
     in a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.
@@ -172,6 +180,12 @@ def read_echem(path,cycle_number=5,co2=True):
     :type cycle_number: int
     :param cycle_number: number of full electrochemical cycles performed.
     
+    :type pH_right_calibration: dict
+    :param pH_right_calibration: dictionary that contains the slope of intercept information of the right pH probe calibration
+
+    :type pH_left_calibration: dict
+    :param pH_left_calibration: dictionary that contains the slope of intercept information of the left pH probe calibration
+
     :rtype: *pd.DataFrame*
     :return: **dataset**: a dataset with multi-cycle continuous Time,Voltage, Current,pH and fitted pH data.
 
@@ -216,9 +230,9 @@ def read_echem(path,cycle_number=5,co2=True):
         ##Deacidification (Charge)
         with open(srcdir+'PWRCHARGE_#'+str(i+1)+'.DTA','r') as file:
             if i == 0:
-                df = analyze_gamry_file(file,starting_date_time)
+                df = analyze_gamry_file(file,starting_date_time,pH_right_calibration=pH_right_calibration,pH_left_calibration=pH_left_calibration)
             else:
-                df = analyze_gamry_file(file,dataset.iloc[-1]['Time'])
+                df = analyze_gamry_file(file,dataset.iloc[-1]['Time'],pH_right_calibration=pH_right_calibration,pH_left_calibration=pH_left_calibration)
         
         
         dataset = dataset.append(df,ignore_index = True)
@@ -226,13 +240,13 @@ def read_echem(path,cycle_number=5,co2=True):
         if co2:
             #invasion data
             with open(voltage_hold_srcdir+'Invasion_#'+str(i+1)+'.DTA','r') as file:
-                df = analyze_gamry_file(file,dataset.iloc[-1]['Time'])
+                df = analyze_gamry_file(file,dataset.iloc[-1]['Time'],pH_right_calibration=pH_right_calibration,pH_left_calibration=pH_left_calibration)
 
             dataset = dataset.append(df,ignore_index = True)
         
         ##Discharge data
         with open(srcdir+'PWRDISCHARGE_#'+str(i+1)+'.DTA','r') as file:
-            df = analyze_gamry_file(file,dataset.iloc[-1]['Time'])
+            df = analyze_gamry_file(file,dataset.iloc[-1]['Time'],pH_right_calibration=pH_right_calibration,pH_left_calibration=pH_left_calibration)
         
         dataset = dataset.append(df,ignore_index = True)
         
@@ -240,7 +254,7 @@ def read_echem(path,cycle_number=5,co2=True):
         ##Outgass data
         if co2:
             with open(voltage_hold_srcdir+'Outgas_#'+str(i+1)+'.DTA','r') as file:
-                df = analyze_gamry_file(file,dataset.iloc[-1]['Time'])
+                df = analyze_gamry_file(file,dataset.iloc[-1]['Time'],pH_right_calibration=pH_right_calibration,pH_left_calibration=pH_left_calibration)
                 #df['pH'] = df['pH'] - 0.1 
 
             dataset = dataset.append(df,ignore_index = True)
@@ -480,7 +494,7 @@ def find_echem_time_period(path,co2=True,cycle_number=5,outgas_time = 165):
                             'Discharge_Start_Time':discharge_start_time_array})
     return dataset
 
-def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=165):
+def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=165,pH_right_calibration={'slope':-17.4,'intercept':7.728},pH_left_calibration={'slope':-17.602,'intercept':7.1728}):
     
     """    
       Combine the results of **read_echem**, **cal_capacity_energy**, 
@@ -530,6 +544,12 @@ def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=165):
       :param cycle_number: number of cycles
 
     
+      :type pH_right_calibration: dict
+      :param pH_right_calibration: dictionary that contains the slope of intercept information of the right pH probe calibration
+
+      :type pH_left_calibration: dict
+      :param pH_left_calibration: dictionary that contains the slope of intercept information of the left pH probe calibration
+
       :rtype: *dict*
       :return: a dictionary of echem_df,energy_df and time_df
     
@@ -541,7 +561,7 @@ def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=165):
     electrochem_path = path
 
     #create echem df
-    echem_df = read_echem(electrochem_path,co2=co2,cycle_number =cycle_number)
+    echem_df = read_echem(electrochem_path,co2=co2,cycle_number =cycle_number,pH_right_calibration=pH_right_calibration,pH_left_calibration=pH_left_calibration)
 
     #concatenate all df and create a total echem df
     echem_df['Hours']=echem_df.index/3600
@@ -555,3 +575,37 @@ def create_echem_dfs(path,co2=False,cycle_number=5,outgas_time=165):
     #display(time_40_df)
     
     return {"echem_df":echem_df,"energy_df":energy_df,"time_df":time_df}
+
+
+def read_gamry_eis(path):
+    """
+    read Gamry EIS file and output a dataframe containing frequency, Zreal and Zimag
+
+    :type path: string
+    :param path: the address of the folder that contains the electrochemistry files.
+
+    :rtype: *pd.DataFrame*
+    :return: a dataset that contains frequency,Zreal and Zimag
+            dataset -> pandas.DataFrame: a dataset that contains the following attributes \n
+            dataset['frequency'] -> float: frequency \n
+            dataset['Zreal'] -> float: real axis impedance \n
+            dataset['Zimag'] -> float: imaginary axis impedance \n
+
+    """
+    with open(path,'r',encoding='windows-1252') as f:
+        indicator = False
+        freq_array = []
+        zreal_array = []
+        zimag_array = []
+        for line in f:
+            if indicator:
+                data = line.split()
+                #print(line.split())
+                freq_array.append(float(data[2]))
+                zreal_array.append(float(data[3]))
+                zimag_array.append(float(data[4]))
+            if line.startswith('	#'):
+                indicator = True
+        
+        dataframe = pd.DataFrame({'Frequency':freq_array,'Zreal':zreal_array,'Zimag':zimag_array})
+        return dataframe
