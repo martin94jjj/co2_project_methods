@@ -481,6 +481,14 @@ def find_echem_time_period(path,co2=True,cycle_number=5,outgas_time = 165):
             if hour >= 24:
                 hour = hour-24
                 day = day+1
+            if day > 30 and month in [4,6,9,11]:
+                day = 1
+                month = month+1
+            if day > 31 and month in [1,3,5,7,8,10,12]:
+                day = 1
+                month = month+1
+            #not accounted for February!!!
+                
             outgas_end_time = datetime.datetime(year,month,day,hour,minute,second)
             outgas_end_time_array.append(outgas_end_time)
     if co2:
