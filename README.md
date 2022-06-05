@@ -1,5 +1,4 @@
 # co2_project
-Hi Maia
 Methods for Analyzing Data for Electrochemical CO2 Capture Project
 ### AUTHOR: Martin Jin                 ###
 ### Date: 20210218                     ###
