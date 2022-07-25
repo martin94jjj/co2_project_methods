@@ -394,3 +394,45 @@ def create_theoretical_dic_pH_array(min_TA = 0,max_TA = 0.2,TA_points=100,captur
            ,"dic_acidification":dic_acidification_array,"pH_low_to_high":pH_low_to_high_array
            ,"pH_high_to_low":pH_high_to_low_array,"dic_low_to_high":dic_low_to_high_array
            ,"dic_high_to_low":dic_high_to_low_array,"capture_pco2":capture_pco2,"outgas_pco2":outgas_pco2}
+
+
+def TA_co2aq_wrapper(pH,solve_value=0):
+    """A function wrapper used when using newton_krylov solver solving for co2aq given **pH** and **TA**, which doesn't take additional arguments
+    
+    :type pH: float
+    :param pH: pH value
+    :type solve_value: float
+    :param solve_value: Target TA value when using solvers from scipy.optimize
+    
+    :rtype: *func*
+    :return: a function used for newton_krylov solver to solve for co2aq, given **pH** and **solve_value** (TA concentration) value
+
+    
+    """
+
+    def func(co2aq):
+        return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)+10**-pH-solve_value
+    return func
+
+
+def calc_dic_TApH(pH_meas,co2aq_guess=400./1000000.*0.035,TA_val=1.0):
+    
+    """Calculates DIC based on input of **pH** and **TA**
+    
+    :type pH_meas: float
+    :param pH_meas: pH value
+    :type co2aq_guess: float
+    :param co2aq_guess: estimated aqueous CO2 concentration
+    :type TA_val: float
+    :param TA_val: TA concentration
+    
+    :rtype: *func*
+    :return: DIC value
+
+    
+    """
+    co2aq_func = TA_co2aq_wrapper(pH_meas,solve_value = TA_val)
+    co2aq_theory = fsolve(co2aq_func,co2aq_guess)
+    dic_TApH = dic(co2aq_theory,pH_meas)
+    
+    return dic_TApH
