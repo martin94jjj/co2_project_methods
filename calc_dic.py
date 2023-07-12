@@ -90,7 +90,7 @@ def TA(co2aq,pH,solve_value = 0):
     :rtype: *float*
     :return: TA value
     """
-    return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)+10**-pH-solve_value
+    return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)-10**-pH-solve_value
 
 def TA_pH_wrapper(co2aq,solve_value = 0):
     """A function wrapper used when using newton_krylov solver solving for pH given **co2aq** and **TA**, which doesn't take additional arguments
@@ -121,7 +121,7 @@ def TA_pH_wrapper(co2aq,solve_value = 0):
     """
 
     def func(pH):
-        return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)+10**-pH-solve_value
+        return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)-10**-pH-solve_value
     return func
 
 def calc_DIC(total_df,echem_time_df,gas_change_time_df,outgas_shift=20,volume=0.01,flag=0,solver="newton_krylov"):
@@ -411,7 +411,7 @@ def TA_co2aq_wrapper(pH,solve_value=0):
     """
 
     def func(co2aq):
-        return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)+10**-pH-solve_value
+        return kw/(10**-pH)+hco3(co2aq,pH)+2*co32(co2aq,pH)-10**-pH-solve_value
     return func
 
 
